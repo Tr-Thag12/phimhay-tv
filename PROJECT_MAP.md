@@ -31,6 +31,8 @@ phimhay-tv-base/
 │     ├─ watchlist.js
 │     └─ history.js
 ├─ assets/
+├─ docs/
+│  └─ UI_REDESIGN_NOTES.md
 ├─ BACKEND_PLAN.md
 ├─ TODO.md
 ├─ README.md
@@ -41,7 +43,7 @@ phimhay-tv-base/
 ## Vai trò từng phần
 
 - `index.html`: Khung HTML chính, giữ header, footer, search overlay, vùng `<main id="app"></main>`, CSS hiện tại và script module `/src/main.js`.
-- `css/style.css`: Toàn bộ giao diện hiện tại. Bước này không đổi class CSS và không đổi layout nhìn thấy.
+- `css/style.css`: Toàn bộ giao diện hiện tại theo phong cách dark cinematic V1, dùng CSS variables và các nhóm style rõ ràng cho base, header, hero, movie card, listing, detail, player, search, account và responsive.
 - `src/main.js`: Điểm khởi động app, import data/router/features, expose tạm các handler cần cho inline `onclick`, khởi tạo event và render ban đầu.
 - `src/data/movies.js`: Dữ liệu mẫu phim và user mock, export qua `movies` và `user`.
 - `src/state/store.js`: State runtime của app như page hiện tại, phim đang chọn, tập đang xem, tab chi tiết, tab account và bộ lọc listing.
@@ -58,6 +60,7 @@ phimhay-tv-base/
 - `src/features/search.js`: Logic search overlay và render kết quả tìm kiếm.
 - `src/features/watchlist.js`: Logic thêm/xóa watchlist, lưu qua `localStorage`.
 - `src/features/history.js`: Logic history xem phim, lưu qua `localStorage`.
+- `docs/UI_REDESIGN_NOTES.md`: Ghi chú tiếng Việt về hướng thiết kế giao diện V1 và những điểm cần cải thiện ở bước sau.
 
 ## Luồng chạy mới
 
@@ -73,5 +76,5 @@ phimhay-tv-base/
 
 - Đây vẫn là frontend mock chạy bằng Vite, HTML/CSS/JavaScript thuần.
 - Chưa có backend, API thật, database, admin hoặc đăng nhập thật.
-- Chưa merge nhánh refactor module vào `main`.
+- Nhánh thiết kế giao diện V1 là `feature/ui-redesign-v1` và chưa merge vào `main`.
 - Không đổi cấu trúc dữ liệu phim mẫu. Dữ liệu hiện được dùng chính qua export module, còn `window.MOVIES`/`window.USER` chỉ được expose tạm trong `src/main.js` để tương thích khi cần kiểm tra nhanh.

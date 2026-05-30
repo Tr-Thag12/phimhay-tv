@@ -2,7 +2,7 @@
 
 Đây là base project front-end cho website xem phim PhimHay TV. Project đang chạy bằng Vite, HTML/CSS/JavaScript thuần và vẫn là frontend mock, chưa có backend/database.
 
-Branch refactor module hiện tại: `feature/refactor-modules`.
+Branch thiết kế giao diện V1 hiện tại: `feature/ui-redesign-v1`.
 
 ```txt
 phimhay-tv-base/
@@ -21,6 +21,8 @@ phimhay-tv-base/
 ├─ BACKEND_PLAN.md
 ├─ TODO.md
 ├─ PROJECT_MAP.md
+├─ docs/
+│  └─ UI_REDESIGN_NOTES.md
 ├─ package.json
 └─ vite.config.mjs
 ```
@@ -68,10 +70,12 @@ npm run preview
 - Lưu phim bằng `localStorage`
 - Lịch sử xem bằng `localStorage`
 - Responsive mobile/tablet/desktop
+- Giao diện dark cinematic V1 cho trải nghiệm giống nền tảng streaming hiện đại
 
 ## Ghi chú phát triển
 
 - Dữ liệu mẫu hiện nằm trong `src/data/movies.js`.
 - Luồng render chính bắt đầu từ `src/main.js`, qua `src/router/router.js`, rồi tới các file view trong `src/render/`.
 - Search, watchlist và history nằm trong `src/features/`.
+- Giao diện chính nằm trong `css/style.css`, dùng CSS variables và chia nhóm style theo base, header, hero, card phim, listing, detail, player, search, account và responsive.
 - Chưa có backend, API thật, database, admin hoặc đăng nhập thật.
