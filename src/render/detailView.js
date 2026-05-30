@@ -1,6 +1,7 @@
 import { movies } from '../data/movies.js';
 import { getState } from '../state/store.js';
 import { escapeHTML, stars, typeLabel } from '../utils/format.js';
+import { imageFallbackAttr } from '../utils/imageFallback.js';
 import { isSaved } from '../features/watchlist.js';
 import { icon, movieById, renderMovieCard } from './layout.js';
 
@@ -14,10 +15,10 @@ export function renderDetail(app) {
     .slice(0, 8);
 
   app.innerHTML = `<div class="detail-page">
-    <section class="detail-hero"><img src="${movie.backdrop}" alt="Backdrop ${escapeHTML(movie.title)}" width="1920" height="1080" loading="eager"></section>
+    <section class="detail-hero"><img src="${movie.backdrop}" alt="Backdrop ${escapeHTML(movie.title)}" width="1920" height="1080" loading="eager" ${imageFallbackAttr('backdrop')}></section>
     <div class="container">
       <div class="detail-content">
-        <img class="detail-poster" src="${movie.poster}" alt="Poster ${escapeHTML(movie.title)}" width="460" height="690">
+        <img class="detail-poster" src="${movie.poster}" alt="Poster ${escapeHTML(movie.title)}" width="460" height="690" loading="eager" ${imageFallbackAttr('poster')}>
         <div class="detail-info">
           <div class="badges"><span class="badge red">TOP</span><span class="badge">${movie.quality}</span><span class="badge">${movie.age}</span><span class="badge gold">${movie.status}</span></div>
           <h1>${escapeHTML(movie.title)}</h1>
@@ -48,10 +49,10 @@ export function renderDetail(app) {
       <div class="tab-panel ${state.detailTab === 'overview' ? 'active' : ''}"><p class="muted" style="max-width:900px;line-height:1.75">${escapeHTML(movie.description)} Đây là phần mô tả tổng quan để bạn có thể thay bằng nội dung thật từ database/API sau này.</p></div>
       <div class="tab-panel ${state.detailTab === 'episodes' ? 'active' : ''}">
         ${seasons.length ? `<select class="select" style="max-width:180px;margin-bottom:16px" onchange="state.season=Number(this.value);renderDetail();createIcons();">${seasons.map(season => `<option value="${season}" ${state.season === season ? 'selected' : ''}>Phần ${season}</option>`).join('')}</select>
-        <div class="episode-grid">${seasonEpisodes.map(ep => `<article class="episode-card ${ep.id === state.currentEpisodeId ? 'active' : ''}" onclick="playMovie(${movie.id}, '${ep.id}')"><img src="${ep.thumb}" alt="Tập ${ep.number}" width="260" height="146" loading="lazy"><div><strong>Tập ${ep.number}: ${escapeHTML(ep.title)}</strong><p class="muted">${ep.duration}</p></div></article>`).join('')}</div>` : '<div class="empty-state">Phim lẻ không có danh sách tập.</div>'}
+        <div class="episode-grid">${seasonEpisodes.map(ep => `<article class="episode-card ${ep.id === state.currentEpisodeId ? 'active' : ''}" onclick="playMovie(${movie.id}, '${ep.id}')"><img src="${ep.thumb}" alt="Tập ${ep.number}" width="260" height="146" loading="lazy" decoding="async" ${imageFallbackAttr('backdrop')}><div><strong>Tập ${ep.number}: ${escapeHTML(ep.title)}</strong><p class="muted">${ep.duration}</p></div></article>`).join('')}</div>` : '<div class="empty-state"><span>' + icon('film') + '</span><strong>Phim lẻ không có danh sách tập.</strong></div>'}
       </div>
-      <div class="tab-panel ${state.detailTab === 'trailer' ? 'active' : ''}"><div class="video-preview"><img src="${movie.trailer}" alt="Trailer ${escapeHTML(movie.title)}" width="1280" height="720" loading="lazy"><button class="play-big" aria-label="Phát trailer">${icon('play')}</button></div></div>
-      <div class="tab-panel ${state.detailTab === 'cast' ? 'active' : ''}"><div class="cast-row">${(movie.cast?.length ? movie.cast : movies[0].cast).map(cast => `<article class="cast-card"><img src="${cast.photo}" alt="${escapeHTML(cast.name)}" width="160" height="160" loading="lazy"><strong>${escapeHTML(cast.name)}</strong><p class="muted">${escapeHTML(cast.role)}</p></article>`).join('')}</div></div>
+      <div class="tab-panel ${state.detailTab === 'trailer' ? 'active' : ''}"><div class="video-preview"><img src="${movie.trailer}" alt="Trailer ${escapeHTML(movie.title)}" width="1280" height="720" loading="lazy" decoding="async" ${imageFallbackAttr('backdrop')}><button class="play-big" aria-label="Phát trailer">${icon('play')}</button></div></div>
+      <div class="tab-panel ${state.detailTab === 'cast' ? 'active' : ''}"><div class="cast-row">${(movie.cast?.length ? movie.cast : movies[0].cast).map(cast => `<article class="cast-card"><img src="${cast.photo}" alt="${escapeHTML(cast.name)}" width="160" height="160" loading="lazy" decoding="async" ${imageFallbackAttr('avatar')}><strong>${escapeHTML(cast.name)}</strong><p class="muted">${escapeHTML(cast.role)}</p></article>`).join('')}</div></div>
       <div class="tab-panel ${state.detailTab === 'reviews' ? 'active' : ''}"><div class="review-list"><div class="account-card"><h2>${movie.rating}/10</h2><p class="stars">${stars(movie.rating)}</p><button class="btn btn-ghost">${icon('edit-3')} Viết đánh giá</button></div>${(movie.reviews?.length ? movie.reviews : movies[0].reviews).map(review => `<div class="review-card"><strong>${escapeHTML(review.user)}</strong> <span class="stars">${stars(review.rating * 2)}</span><p class="muted">${escapeHTML(review.text)}</p><small class="muted">${review.time}</small></div>`).join('')}</div></div>
       <div class="tab-panel ${state.detailTab === 'similar' ? 'active' : ''}"><div class="scroll-row">${similar.map(item => renderMovieCard(item)).join('')}</div></div>
     </div>

@@ -18,6 +18,7 @@ phimhay-tv-base/
 │  ├─ utils/
 │  │  ├─ dom.js
 │  │  ├─ format.js
+│  │  ├─ imageFallback.js
 │  │  └─ storage.js
 │  ├─ render/
 │  │  ├─ layout.js
@@ -51,6 +52,7 @@ phimhay-tv-base/
 - `src/utils/storage.js`: Helper đọc/ghi/xóa `localStorage` an toàn bằng JSON, trả default value nếu dữ liệu lỗi.
 - `src/utils/dom.js`: Helper DOM như `qs`, `qsa`, `setHTML`, `onClick`, `createIcons`.
 - `src/utils/format.js`: Helper format/escape như `escapeHTML`, `stars`, `typeLabel`, `formatYear`, `formatDuration`, `formatRating`, `formatViewCount`.
+- `src/utils/imageFallback.js`: Tạo ảnh fallback nội bộ dạng SVG data URI và thuộc tính xử lý `onerror` cho poster/backdrop/avatar.
 - `src/render/layout.js`: Các phần render dùng chung như active nav, empty state, movie card, icon, lookup movie, mobile menu và player menu.
 - `src/render/homeView.js`: Render trang chủ, hero, tiếp tục xem, top phim, phim mới và thể loại.
 - `src/render/listingView.js`: Render trang danh sách phim, search/filter/sort trong listing.

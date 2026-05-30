@@ -1,6 +1,7 @@
 import { movies } from '../data/movies.js';
 import { getHistory } from '../features/history.js';
 import { escapeHTML, typeLabel } from '../utils/format.js';
+import { imageFallbackAttr } from '../utils/imageFallback.js';
 import { icon, movieById, renderEmptyState, renderMovieCard } from './layout.js';
 
 export function renderHome(app) {
@@ -13,9 +14,9 @@ export function renderHome(app) {
 
   app.innerHTML = `
     <section class="hero">
-      <img class="hero-bg" src="${hero.backdrop}" alt="Backdrop ${escapeHTML(hero.title)}" width="1920" height="1080" loading="eager" fetchpriority="high">
+      <img class="hero-bg" src="${hero.backdrop}" alt="Backdrop ${escapeHTML(hero.title)}" width="1920" height="1080" loading="eager" fetchpriority="high" ${imageFallbackAttr('backdrop')}>
       <div class="hero-content">
-        <img class="hero-poster" src="${hero.poster}" alt="Poster ${escapeHTML(hero.title)}" width="360" height="540">
+        <img class="hero-poster" src="${hero.poster}" alt="Poster ${escapeHTML(hero.title)}" width="360" height="540" loading="eager" ${imageFallbackAttr('poster')}>
         <div>
           <div class="badges"><span class="badge red">TOP 1</span><span class="badge">${hero.quality}</span><span class="badge">${hero.age}</span><span class="badge gold">${hero.status}</span></div>
           <h1>${escapeHTML(hero.title)}</h1>
@@ -35,7 +36,7 @@ export function renderHome(app) {
         <div class="scroll-row">
           ${continueItems.length ? continueItems.map(item => `
           <article class="wide-card" onclick="playMovie(${item.movie.id}, '${item.episodeId || ''}')">
-            <img src="${item.movie.backdrop}" alt="${escapeHTML(item.movie.title)}" width="640" height="360" loading="lazy">
+            <img src="${item.movie.backdrop}" alt="${escapeHTML(item.movie.title)}" width="640" height="360" loading="lazy" decoding="async" ${imageFallbackAttr('backdrop')}>
             <div class="progress"><span style="width:${item.progress}%"></span></div>
             <div class="card-overlay" style="opacity:0" onclick="event.stopPropagation(); playMovie(${item.movie.id}, '${item.episodeId || ''}')">${icon('play')}<strong>${escapeHTML(item.movie.title)}</strong><small>Đã xem ${item.progress}%</small></div>
           </article>`).join('') : renderEmptyState('Bạn chưa xem phim nào.')}
@@ -43,7 +44,7 @@ export function renderHome(app) {
       </section>
       <section class="section">
         <div class="section-head"><h2 class="section-title">Top 10 thịnh hành</h2></div>
-        <div class="scroll-row">${top.map((movie, i) => `<article class="top-card" onclick="navigateTo('detail',{movieId:${movie.id}})"><span class="top-number">${i + 1}</span><img src="${movie.poster}" alt="${escapeHTML(movie.title)}" width="260" height="390" loading="lazy"></article>`).join('')}</div>
+        <div class="scroll-row">${top.map((movie, i) => `<article class="top-card" onclick="navigateTo('detail',{movieId:${movie.id}})"><span class="top-number">${i + 1}</span><img src="${movie.poster}" alt="${escapeHTML(movie.title)}" width="260" height="390" loading="lazy" decoding="async" ${imageFallbackAttr('poster')}></article>`).join('')}</div>
       </section>
       <section class="section">
         <div class="section-head"><h2 class="section-title">Phim mới cập nhật</h2><button class="btn btn-ghost" onclick="navigateTo('listing')">Xem tất cả</button></div>

@@ -23,6 +23,14 @@ Giao diện V1 được thiết kế lại theo phong cách dark cinematic, phù
 - Tablet/desktop nhỏ 1024px.
 - Desktop full width.
 
+## Bước 3.1: Đánh bóng giao diện
+
+- Thêm helper fallback ảnh nội bộ tại `src/utils/imageFallback.js`.
+- Poster, backdrop, thumbnail tập phim, ảnh trailer, ảnh diễn viên, ảnh history và avatar account có xử lý `onerror` để không vỡ layout khi ảnh online lỗi.
+- Empty state được làm rõ hơn bằng nền nhẹ, icon và chữ nổi bật.
+- Bổ sung `decoding="async"` và `loading="lazy"` cho các ảnh không quan trọng phía dưới.
+- Tinh chỉnh CSS cho ảnh fallback, card phim và trạng thái rỗng để thống nhất với giao diện dark cinematic.
+
 ## Giới hạn của bước này
 
 - Chưa thêm backend, database, admin hoặc đăng nhập thật.
@@ -33,7 +41,6 @@ Giao diện V1 được thiết kế lại theo phong cách dark cinematic, phù
 
 ## Nên cải thiện ở bước sau
 
-- Thêm ảnh fallback nội bộ cho poster/backdrop khi ảnh online lỗi.
 - Tách CSS lớn thành nhiều file nếu dự án tiếp tục mở rộng.
 - Bổ sung trạng thái loading/skeleton nếu sau này dùng API thật.
 - Làm URL routing thật cho từng trang/phim khi bước backend hoặc SPA routing được yêu cầu.

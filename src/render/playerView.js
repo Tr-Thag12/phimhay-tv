@@ -1,6 +1,7 @@
 import { movies } from '../data/movies.js';
 import { getState } from '../state/store.js';
 import { escapeHTML } from '../utils/format.js';
+import { imageFallbackAttr } from '../utils/imageFallback.js';
 import { icon, movieById, renderMovieCard } from './layout.js';
 
 export function renderPlayer(app) {
@@ -10,7 +11,7 @@ export function renderPlayer(app) {
 
   app.innerHTML = `<div class="player-page">
     <section class="player-shell"><div class="player-box">
-      <img src="${movie.backdrop}" alt="Player ${escapeHTML(movie.title)}" width="1920" height="1080">
+      <img src="${movie.backdrop}" alt="Player ${escapeHTML(movie.title)}" width="1920" height="1080" loading="eager" ${imageFallbackAttr('backdrop')}>
       <button class="play-big" aria-label="Phát phim">${icon('play')}</button>
       <div class="player-controls">
         <div class="timeline"><span></span></div>
@@ -29,7 +30,7 @@ export function renderPlayer(app) {
         <p class="muted">${escapeHTML(movie.description)}</p>
         <div class="actions"><button class="btn btn-ghost">${icon('skip-back')} Tập trước</button><button class="btn btn-primary">Tập tiếp theo ${icon('skip-forward')}</button><button class="btn btn-danger">${icon('alert-triangle')} Báo lỗi phim</button></div>
       </div>
-      <aside><h3>Danh sách tập</h3><div class="episode-list">${movie.episodes?.length ? movie.episodes.map(ep => `<div class="episode-row ${ep.id === state.currentEpisodeId ? 'active' : ''}" onclick="playMovie(${movie.id}, '${ep.id}')"><strong>${String(ep.number).padStart(2,'0')}</strong><span>${escapeHTML(ep.title)} • ${ep.duration}</span>${ep.id === state.currentEpisodeId ? '<small>Đang xem</small>' : ''}</div>`).join('') : '<div class="empty-state">Phim lẻ</div>'}</div></aside>
+      <aside><h3>Danh sách tập</h3><div class="episode-list">${movie.episodes?.length ? movie.episodes.map(ep => `<div class="episode-row ${ep.id === state.currentEpisodeId ? 'active' : ''}" onclick="playMovie(${movie.id}, '${ep.id}')"><strong>${String(ep.number).padStart(2,'0')}</strong><span>${escapeHTML(ep.title)} • ${ep.duration}</span>${ep.id === state.currentEpisodeId ? '<small>Đang xem</small>' : ''}</div>`).join('') : `<div class="empty-state"><span>${icon('film')}</span><strong>Phim lẻ</strong></div>`}</div></aside>
     </div>
     <div class="container section"><h2 class="section-title">Có thể bạn cũng thích</h2><div class="scroll-row">${movies.filter(item => item.id !== movie.id).slice(0,8).map(item => renderMovieCard(item)).join('')}</div></div>
   </div>`;

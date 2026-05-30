@@ -1,6 +1,7 @@
 import { movies } from '../data/movies.js';
 import { qsa } from '../utils/dom.js';
 import { escapeHTML } from '../utils/format.js';
+import { imageFallbackAttr } from '../utils/imageFallback.js';
 import { isSaved } from '../features/watchlist.js';
 
 export function movieById(id) {
@@ -22,7 +23,7 @@ export function renderHeaderActive(page) {
 }
 
 export function renderEmptyState(message, attrs = '') {
-  return `<div class="empty-state"${attrs}>${message}</div>`;
+  return `<div class="empty-state"${attrs}><span>${icon('film')}</span><strong>${message}</strong></div>`;
 }
 
 export function renderMovieCard(movie) {
@@ -30,7 +31,7 @@ export function renderMovieCard(movie) {
 
   return `
     <article class="movie-card" onclick="navigateTo('detail',{movieId:${movie.id}})">
-      <img src="${movie.poster}" alt="Poster ${escapeHTML(movie.title)}" width="300" height="450" loading="lazy">
+      <img src="${movie.poster}" alt="Poster ${escapeHTML(movie.title)}" width="300" height="450" loading="lazy" decoding="async" ${imageFallbackAttr('poster')}>
       <div class="badges" style="position:absolute;top:9px;left:9px">
         <span class="badge ${movie.quality === '4K' ? 'red' : ''}">${movie.quality}</span>
         <span class="badge">${movie.age}</span>

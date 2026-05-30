@@ -63,6 +63,10 @@ img {
   max-width: 100%;
   background: linear-gradient(135deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .02));
 }
+.image-fallback {
+  object-fit: cover;
+  background: linear-gradient(135deg, #111827, #2a1018 46%, #07080d);
+}
 .page { min-height: 78vh; }
 .container {
   width: min(100%, var(--container));
@@ -406,6 +410,7 @@ img {
 }
 .movie-card > img {
   width: 100%;
+  height: auto;
   aspect-ratio: 2/3;
   object-fit: cover;
   transition: transform .35s ease, filter .25s ease;
@@ -714,12 +719,49 @@ img {
   color: white;
 }
 .empty-state {
-  padding: 44px 22px;
+  min-height: 150px;
+  padding: 34px 24px;
   border: 1px dashed rgba(255, 255, 255, .2);
   border-radius: var(--radius-lg);
   color: var(--muted);
-  background: rgba(255, 255, 255, .035);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(240, 68, 56, .14), transparent 60%),
+    rgba(255, 255, 255, .035);
   text-align: center;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+}
+.empty-state span {
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 999px;
+  color: #ffb199;
+  background: rgba(255, 255, 255, .08);
+  display: inline-grid;
+  place-items: center;
+}
+.empty-state span svg {
+  width: 22px;
+  height: 22px;
+}
+.empty-state strong {
+  color: rgba(255, 255, 255, .9);
+  font-size: .98rem;
+}
+.empty-state:not(:has(span))::before {
+  content: 'PhimHay';
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  color: white;
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+  display: inline-grid;
+  place-items: center;
+  font-size: .68rem;
+  font-weight: 900;
 }
 
 /* detail */
