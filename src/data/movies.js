@@ -1,4 +1,4 @@
-window.MOVIES = [
+export const movies = [
   {
     id: 1,
     title: 'Bóng Đêm Sài Gòn',
@@ -62,7 +62,7 @@ window.MOVIES = [
   { id: 12, title: 'Tuổi Học Trò', originalTitle: 'School Days', year: 2024, type: 'series', status: 'Đang chiếu', country: 'Việt Nam', genres: ['Thanh xuân', 'Tình cảm'], age: 'T13', quality: 'HD', duration: '16 tập × 40p', rating: 8.0, views: '950K', director: 'Minh Phương', language: 'Tiếng Việt', subtitle: 'Việt', description: 'Ký ức tuổi học trò, tình bạn và những rung động đầu đời.', poster: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=600&auto=format&fit=crop', backdrop: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1600&auto=format&fit=crop', trailer: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1600&auto=format&fit=crop', cast: [], episodes: [], reviews: [] }
 ];
 
-window.USER = {
+export const user = {
   name: 'Trịnh Xuân Thắng',
   email: 'trinhthangngon1@gmail.com',
   plan: 'Premium 4K',

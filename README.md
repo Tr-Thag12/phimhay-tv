@@ -1,17 +1,23 @@
 # PhimHay TV - Base Project
 
-Đây là base project front-end cho website xem phim. Mình đã tách giao diện thành cấu trúc dễ làm tiếp:
+Đây là base project front-end cho website xem phim PhimHay TV. Project đang chạy bằng Vite, HTML/CSS/JavaScript thuần và vẫn là frontend mock, chưa có backend/database.
+
+Branch refactor module hiện tại: `feature/refactor-modules`.
 
 ```txt
 phimhay-tv-base/
 ├─ index.html
 ├─ css/
 │  └─ style.css
-├─ js/
-│  ├─ data.js
-│  └─ app.js
+├─ src/
+│  ├─ main.js
+│  ├─ data/
+│  ├─ state/
+│  ├─ router/
+│  ├─ utils/
+│  ├─ render/
+│  └─ features/
 ├─ assets/
-│  └─ images/
 ├─ BACKEND_PLAN.md
 ├─ TODO.md
 ├─ PROJECT_MAP.md
@@ -27,7 +33,7 @@ Cài dependency:
 npm install
 ```
 
-Chạy dev server bằng Vite:
+Chạy dev server:
 
 ```bash
 npm run dev
@@ -57,14 +63,15 @@ npm run preview
 - Trang danh sách phim + bộ lọc
 - Trang chi tiết phim + tab
 - Trang xem phim/player giả lập
-- Trang tài khoản
+- Trang tài khoản mock
 - Tìm kiếm overlay
-- Lưu phim bằng localStorage
-- Lịch sử xem bằng localStorage
+- Lưu phim bằng `localStorage`
+- Lịch sử xem bằng `localStorage`
 - Responsive mobile/tablet/desktop
 
-## Chỗ cần thay sau này
+## Ghi chú phát triển
 
-- Thay dữ liệu mẫu trong `js/data.js` bằng dữ liệu từ database/API.
-- Thay ảnh URL online bằng ảnh upload của dự án.
-- Nếu làm PHP/Laravel/Node, giữ `css/style.css` và chuyển các phần render trong `app.js` thành template/view tương ứng.
+- Dữ liệu mẫu hiện nằm trong `src/data/movies.js`.
+- Luồng render chính bắt đầu từ `src/main.js`, qua `src/router/router.js`, rồi tới các file view trong `src/render/`.
+- Search, watchlist và history nằm trong `src/features/`.
+- Chưa có backend, API thật, database, admin hoặc đăng nhập thật.
