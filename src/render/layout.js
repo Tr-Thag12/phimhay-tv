@@ -2,6 +2,7 @@ import { movies } from '../data/movies.js';
 import { qsa } from '../utils/dom.js';
 import { escapeHTML } from '../utils/format.js';
 import { imageFallbackAttr } from '../utils/imageFallback.js';
+import { detailUrl, watchUrl } from '../utils/slug.js';
 import { isSaved } from '../features/watchlist.js';
 
 export function movieById(id) {
@@ -16,9 +17,13 @@ export function renderHeaderActive(page) {
   qsa('.nav-link').forEach(link => link.classList.remove('active'));
 
   if (page === 'home') {
-    document.querySelector('[data-page="home"]')?.classList.add('active');
-  } else if (['listing', 'detail', 'player'].includes(page)) {
-    document.querySelector('[data-page="listing"]')?.classList.add('active');
+    document.querySelector('[data-route="home"], [data-page="home"]')?.classList.add('active');
+  } else if (page === 'movie') {
+    document.querySelector('[data-route="movie"]')?.classList.add('active');
+  } else if (page === 'series') {
+    document.querySelector('[data-route="series"]')?.classList.add('active');
+  } else if (page === 'explore' || ['listing', 'detail', 'player', 'search'].includes(page)) {
+    document.querySelector('[data-route="explore"], [data-page="listing"]')?.classList.add('active');
   }
 }
 
@@ -30,22 +35,24 @@ export function renderMovieCard(movie) {
   const saved = isSaved(movie.id);
 
   return `
-    <article class="movie-card" onclick="navigateTo('detail',{movieId:${movie.id}})">
-      <img src="${movie.poster}" alt="Poster ${escapeHTML(movie.title)}" width="300" height="450" loading="lazy" decoding="async" ${imageFallbackAttr('poster')}>
-      <div class="badges" style="position:absolute;top:9px;left:9px">
-        <span class="badge ${movie.quality === '4K' ? 'red' : ''}">${movie.quality}</span>
-        <span class="badge">${movie.age}</span>
-      </div>
-      <div class="movie-card-info">
-        <h3 class="movie-card-title">${escapeHTML(movie.title)}</h3>
-        <div class="movie-card-meta">${movie.year} • ${movie.genres[0]} • ${movie.rating}</div>
-      </div>
+    <article class="movie-card">
+      <a class="movie-card-link" href="${detailUrl(movie)}" aria-label="Xem chi tiết ${escapeHTML(movie.title)}">
+        <img src="${movie.poster}" alt="Poster ${escapeHTML(movie.title)}" width="300" height="450" loading="lazy" decoding="async" ${imageFallbackAttr('poster')}>
+        <div class="badges" style="position:absolute;top:9px;left:9px">
+          <span class="badge ${movie.quality === '4K' ? 'red' : ''}">${movie.quality}</span>
+          <span class="badge">${movie.age}</span>
+        </div>
+        <div class="movie-card-info">
+          <h3 class="movie-card-title">${escapeHTML(movie.title)}</h3>
+          <div class="movie-card-meta">${movie.year} • ${movie.genres[0]} • ${movie.rating}</div>
+        </div>
+      </a>
       <div class="card-overlay">
         <div class="card-small-actions">
-          <button class="round-btn red" type="button" aria-label="Xem phim" onclick="playMovie(${movie.id}, null, event)">${icon('play')}</button>
+          <a class="round-btn red" href="${watchUrl(movie)}" aria-label="Xem phim">${icon('play')}</a>
           <button class="round-btn ${saved ? 'active' : ''}" type="button" aria-label="${saved ? 'Bỏ lưu' : 'Lưu phim'}" onclick="toggleSave(${movie.id}, event)">${icon('bookmark')}</button>
         </div>
-        <strong>${escapeHTML(movie.title)}</strong>
+        <a href="${detailUrl(movie)}"><strong>${escapeHTML(movie.title)}</strong></a>
         <small>${escapeHTML(movie.description.slice(0, 82))}...</small>
       </div>
     </article>`;

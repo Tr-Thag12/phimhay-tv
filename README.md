@@ -2,7 +2,7 @@
 
 Đây là base project front-end cho website xem phim PhimHay TV. Project đang chạy bằng Vite, HTML/CSS/JavaScript thuần và vẫn là frontend mock, chưa có backend/database.
 
-Branch thiết kế giao diện V1 hiện tại: `feature/ui-redesign-v1`.
+Branch phát triển routing/SEO của bước này: `feature/url-routing-seo`.
 
 ```txt
 phimhay-tv-base/
@@ -67,15 +67,28 @@ npm run preview
 - Trang xem phim/player giả lập
 - Trang tài khoản mock
 - Tìm kiếm overlay
+- URL routing bằng History API, không dùng hash route
+- SEO meta cơ bản: `document.title`, meta description và canonical theo route
 - Lưu phim bằng `localStorage`
 - Lịch sử xem bằng `localStorage`
 - Responsive mobile/tablet/desktop
 - Giao diện dark cinematic V1 cho trải nghiệm giống nền tảng streaming hiện đại
 
+## Route chính
+
+- `/`: Trang chủ
+- `/phim-le`: Danh sách phim lẻ
+- `/phim-bo`: Danh sách phim bộ
+- `/the-loai/:slug`: Danh sách phim theo thể loại
+- `/phim/:slug`: Chi tiết phim
+- `/xem/:slug/tap-:episode`: Player giả lập
+- `/tim-kiem?q=keyword`: Trang kết quả tìm kiếm
+- `/tai-khoan`: Tài khoản mock
+
 ## Ghi chú phát triển
 
 - Dữ liệu mẫu hiện nằm trong `src/data/movies.js`.
-- Luồng render chính bắt đầu từ `src/main.js`, qua `src/router/router.js`, rồi tới các file view trong `src/render/`.
+- Luồng render chính bắt đầu từ `src/main.js`, qua `src/router/router.js`, đọc URL hiện tại rồi tới các file view trong `src/render/`.
 - Search, watchlist và history nằm trong `src/features/`.
 - Giao diện chính nằm trong `css/style.css`, dùng CSS variables và chia nhóm style theo base, header, hero, card phim, listing, detail, player, search, account và responsive.
 - Chưa có backend, API thật, database, admin hoặc đăng nhập thật.

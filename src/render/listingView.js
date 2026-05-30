@@ -31,9 +31,14 @@ function filterGroup(label, key, values) {
 export function renderListing(app) {
   const state = getState();
   const movies = filteredMovies();
+  const heading = state.filters.genre !== 'Tất cả'
+    ? `Thể loại ${state.filters.genre}`
+    : state.filters.type !== 'Tất cả'
+      ? state.filters.type
+      : 'Khám phá phim';
 
   app.innerHTML = `<div class="listing-page container">
-    <h1 class="page-title">Khám phá phim</h1>
+    <h1 class="page-title">${heading}</h1>
     <p class="muted">Tìm kiếm bộ phim yêu thích theo thể loại, quốc gia, năm phát hành và đánh giá.</p>
     <div class="filter-box">
       <input class="filter-search" id="listing-search" type="search" placeholder="Tìm phim, diễn viên, thể loại..." value="${escapeHTML(state.filters.keyword)}">

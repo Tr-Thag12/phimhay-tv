@@ -12,7 +12,10 @@ const state = {
   },
   detailTab: 'overview',
   accountTab: 'profile',
-  season: 1
+  season: 1,
+  searchKeyword: '',
+  notFoundMessage: '',
+  activeRoute: 'home'
 };
 
 export function getState() {
