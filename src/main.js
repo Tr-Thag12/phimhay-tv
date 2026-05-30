@@ -1,7 +1,8 @@
 import { movies, user } from './data/movies.js';
-import { initSearch } from './features/search.js';
+import { initSearch, openSearch } from './features/search.js';
 import { setWatchlistChangeHandler, toggleSave } from './features/watchlist.js';
 import {
+  initCurrentRoute,
   initRouterEvents,
   navigateTo,
   navigateToAccount,
@@ -9,6 +10,7 @@ import {
   navigateToHome,
   navigateToListing,
   navigateToPlayer,
+  navigateToSearch,
   playMovie,
   render,
   renderCurrentDetail,
@@ -17,7 +19,7 @@ import {
 } from './router/router.js';
 import { state } from './state/store.js';
 import { createIcons } from './utils/dom.js';
-import { renderHeaderActive, togglePlayerMenu } from './render/layout.js';
+import { togglePlayerMenu } from './render/layout.js';
 
 window.MOVIES = movies;
 window.USER = user;
@@ -28,9 +30,11 @@ Object.assign(window, {
   navigateToListing,
   navigateToDetail,
   navigateToPlayer,
+  navigateToSearch,
   navigateToAccount,
   toggleSave,
   playMovie,
+  openSearch,
   setDetailTab,
   togglePlayerMenu,
   setAccountTab,
@@ -41,5 +45,4 @@ Object.assign(window, {
 setWatchlistChangeHandler(render);
 initRouterEvents();
 initSearch();
-renderHeaderActive('home');
-render();
+initCurrentRoute();

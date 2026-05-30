@@ -2,12 +2,17 @@ import { movies } from '../data/movies.js';
 import { getState } from '../state/store.js';
 import { escapeHTML } from '../utils/format.js';
 import { imageFallbackAttr } from '../utils/imageFallback.js';
+import { detailUrl, watchUrl } from '../utils/slug.js';
 import { icon, movieById, renderMovieCard } from './layout.js';
 
 export function renderPlayer(app) {
   const state = getState();
   const movie = movieById(state.selectedMovieId);
-  const episode = movie.episodes?.find(ep => ep.id === state.currentEpisodeId) || movie.episodes?.[0];
+  const episodes = movie.episodes || [];
+  const episode = episodes.find(ep => ep.id === state.currentEpisodeId) || episodes[0];
+  const episodeIndex = episode ? episodes.findIndex(ep => ep.id === episode.id) : -1;
+  const previousEpisode = episodeIndex > 0 ? episodes[episodeIndex - 1] : null;
+  const nextEpisode = episodeIndex >= 0 && episodeIndex < episodes.length - 1 ? episodes[episodeIndex + 1] : null;
 
   app.innerHTML = `<div class="player-page">
     <section class="player-shell"><div class="player-box">
@@ -23,14 +28,18 @@ export function renderPlayer(app) {
     </div></section>
     <div class="container player-info">
       <div>
-        <button class="btn btn-ghost" onclick="navigateTo('detail',{movieId:${movie.id}})">${icon('arrow-left')} Quay lại chi tiết phim</button>
+        <a class="btn btn-ghost" href="${detailUrl(movie)}">${icon('arrow-left')} Quay lại chi tiết phim</a>
         <h1>${escapeHTML(movie.title)}</h1>
         <p class="muted">${episode ? `Tập ${episode.number}: ${escapeHTML(episode.title)}` : movie.duration}</p>
         <div class="badges"><span class="badge">${movie.year}</span><span class="badge">${movie.quality}</span><span class="badge">${movie.age}</span><span class="badge">${movie.genres.join(', ')}</span></div>
         <p class="muted">${escapeHTML(movie.description)}</p>
-        <div class="actions"><button class="btn btn-ghost">${icon('skip-back')} Tập trước</button><button class="btn btn-primary">Tập tiếp theo ${icon('skip-forward')}</button><button class="btn btn-danger">${icon('alert-triangle')} Báo lỗi phim</button></div>
+        <div class="actions">
+          ${previousEpisode ? `<a class="btn btn-ghost" href="${watchUrl(movie, previousEpisode.id)}">${icon('skip-back')} Tập trước</a>` : `<button class="btn btn-ghost" type="button" disabled>${icon('skip-back')} Tập trước</button>`}
+          ${nextEpisode ? `<a class="btn btn-primary" href="${watchUrl(movie, nextEpisode.id)}">Tập tiếp theo ${icon('skip-forward')}</a>` : `<button class="btn btn-primary" type="button" disabled>Tập tiếp theo ${icon('skip-forward')}</button>`}
+          <button class="btn btn-danger">${icon('alert-triangle')} Báo lỗi phim</button>
+        </div>
       </div>
-      <aside><h3>Danh sách tập</h3><div class="episode-list">${movie.episodes?.length ? movie.episodes.map(ep => `<div class="episode-row ${ep.id === state.currentEpisodeId ? 'active' : ''}" onclick="playMovie(${movie.id}, '${ep.id}')"><strong>${String(ep.number).padStart(2,'0')}</strong><span>${escapeHTML(ep.title)} • ${ep.duration}</span>${ep.id === state.currentEpisodeId ? '<small>Đang xem</small>' : ''}</div>`).join('') : `<div class="empty-state"><span>${icon('film')}</span><strong>Phim lẻ</strong></div>`}</div></aside>
+      <aside><h3>Danh sách tập</h3><div class="episode-list">${episodes.length ? episodes.map(ep => `<a class="episode-row ${ep.id === state.currentEpisodeId ? 'active' : ''}" href="${watchUrl(movie, ep.id)}"><strong>${String(ep.number).padStart(2,'0')}</strong><span>${escapeHTML(ep.title)} • ${ep.duration}</span>${ep.id === state.currentEpisodeId ? '<small>Đang xem</small>' : ''}</a>`).join('') : `<div class="empty-state"><span>${icon('film')}</span><strong>Phim lẻ</strong></div>`}</div></aside>
     </div>
     <div class="container section"><h2 class="section-title">Có thể bạn cũng thích</h2><div class="scroll-row">${movies.filter(item => item.id !== movie.id).slice(0,8).map(item => renderMovieCard(item)).join('')}</div></div>
   </div>`;
