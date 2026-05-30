@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PhimHay TV</title>
+  <meta name="description" content="Base project website xem phim PhimHay TV" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <header class="site-header" id="site-header">
+    <div class="header-inner">
+      <button class="brand" type="button" data-page="home" aria-label="Về trang chủ">PhimHay<span>TV</span></button>
+
+      <nav class="desktop-nav" aria-label="Điều hướng chính">
+        <button class="nav-link active" type="button" data-page="home">Trang chủ</button>
+        <button class="nav-link" type="button" data-page="listing" data-list-type="movie">Phim lẻ</button>
+        <button class="nav-link" type="button" data-page="listing" data-list-type="series">Phim bộ</button>
+        <button class="nav-link" type="button" data-page="listing">Khám phá</button>
+      </nav>
+
+      <div class="header-actions">
+        <button class="icon-btn" type="button" id="open-search" aria-label="Tìm kiếm"><i data-lucide="search"></i></button>
+        <button class="icon-btn hide-sm" type="button" aria-label="Thông báo"><i data-lucide="bell"></i></button>
+        <button class="avatar-btn" type="button" data-page="account" aria-label="Tài khoản">
+          <img src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=120&auto=format&fit=crop" alt="Avatar người dùng" width="40" height="40" />
+        </button>
+        <button class="icon-btn mobile-only" type="button" id="mobile-menu-btn" aria-label="Mở menu"><i data-lucide="menu"></i></button>
+      </div>
+    </div>
+
+    <div class="mobile-menu" id="mobile-menu" aria-label="Menu mobile">
+      <button type="button" data-page="home">Trang chủ</button>
+      <button type="button" data-page="listing" data-list-type="movie">Phim lẻ</button>
+      <button type="button" data-page="listing" data-list-type="series">Phim bộ</button>
+      <button type="button" data-page="account">Tài khoản</button>
+    </div>
+  </header>
+
+  <div class="search-overlay" id="search-overlay" role="dialog" aria-modal="true" aria-label="Tìm kiếm phim">
+    <div class="search-panel">
+      <div class="search-row">
+        <div class="search-input-wrap">
+          <i data-lucide="search"></i>
+          <input id="search-input" type="search" placeholder="Tìm phim, diễn viên, thể loại..." autocomplete="off" />
+        </div>
+        <button class="icon-btn" type="button" id="close-search" aria-label="Đóng tìm kiếm"><i data-lucide="x"></i></button>
+      </div>
+      <div class="suggestions">
+        <span>Từ khóa phổ biến:</span>
+        <button type="button" data-search="hành động">Hành động</button>
+        <button type="button" data-search="Việt Nam">Phim Việt Nam</button>
+        <button type="button" data-search="2024">Phim 2024</button>
+        <button type="button" data-search="kinh dị">Kinh dị</button>
+      </div>
+      <div class="search-results" id="search-results"></div>
+    </div>
+  </div>
+
+  <main id="app"></main>
+
+  <footer class="footer">
+    <div class="footer-main">
+      <div>
+        <h3>PhimHay TV</h3>
+        <p>Nền tảng xem phim trực tuyến dành cho người Việt.</p>
+      </div>
+      <nav class="footer-links" aria-label="Liên kết cuối trang">
+        <a href="#">Điều khoản</a>
+        <a href="#">Chính sách bảo mật</a>
+        <a href="#">Trợ giúp</a>
+        <a href="#">Liên hệ</a>
+      </nav>
+      <div class="socials" aria-label="Mạng xã hội">
+        <i data-lucide="facebook"></i>
+        <i data-lucide="instagram"></i>
+        <i data-lucide="youtube"></i>
+      </div>
+    </div>
+    <p class="copyright">© 2026 PhimHay TV. Base project for student assignment.</p>
+  </footer>
+
+  <script type="module" src="/js/data.js"></script>
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
