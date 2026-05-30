@@ -2,7 +2,7 @@
 
 Đây là base project front-end cho website xem phim PhimHay TV. Project đang chạy bằng Vite, HTML/CSS/JavaScript thuần và vẫn là frontend mock, chưa có backend/database.
 
-Branch phát triển routing/SEO của bước này: `feature/url-routing-seo`.
+Branch chuẩn bị deploy Vercel của bước này: `feature/deploy-vercel`.
 
 ```txt
 phimhay-tv-base/
@@ -22,8 +22,11 @@ phimhay-tv-base/
 ├─ TODO.md
 ├─ PROJECT_MAP.md
 ├─ docs/
-│  └─ UI_REDESIGN_NOTES.md
+│  ├─ UI_REDESIGN_NOTES.md
+│  ├─ ROUTING_SEO_NOTES.md
+│  └─ DEPLOYMENT_NOTES.md
 ├─ package.json
+├─ vercel.json
 └─ vite.config.mjs
 ```
 
@@ -58,6 +61,22 @@ Preview bản build:
 ```bash
 npm run preview
 ```
+
+## Deploy Vercel
+
+Có thể deploy demo bằng Vercel Dashboard:
+
+1. Import repo GitHub `Tr-Thag12/phimhay-tv`.
+2. Chọn Framework Preset: `Vite`.
+3. Build command: `npm run build`.
+4. Output directory: `dist`.
+5. Production branch: `main`.
+
+Ghi chú:
+
+- Project đang dùng URL routing bằng History API.
+- File `vercel.json` dùng rewrites để reload các route con như `/phim-le`, `/phim/bong-dem-sai-gon`, `/xem/bong-dem-sai-gon/tap-1` không bị 404 ở production.
+- Đây vẫn là frontend mock, chưa có backend/database.
 
 ## Đã có sẵn
 
