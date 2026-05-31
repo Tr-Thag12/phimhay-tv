@@ -4,7 +4,7 @@
 
 Demo Vercel: https://phimhay-tv.vercel.app/
 
-Branch cập nhật tài liệu demo của bước này: `docs/cap-nhat-link-demo-vercel`.
+Branch thiết kế backend schema/API của bước này: `docs/thiet-ke-backend-schema-api`.
 
 ```txt
 phimhay-tv-base/
@@ -28,6 +28,10 @@ phimhay-tv-base/
 │  ├─ USER_FLOWS.md
 │  ├─ FEATURE_ROADMAP.md
 │  ├─ BACKEND_PLAN.md
+│  ├─ DATABASE_SCHEMA.md
+│  ├─ API_CONTRACT.md
+│  ├─ SECURITY_PLAN.md
+│  ├─ BACKEND_TASKS.md
 │  ├─ NEXT_STEPS.md
 │  ├─ UI_REDESIGN_NOTES.md
 │  ├─ ROUTING_SEO_NOTES.md
@@ -85,6 +89,10 @@ https://phimhay-tv.vercel.app/
 - [Luồng người dùng](docs/USER_FLOWS.md)
 - [Roadmap chức năng](docs/FEATURE_ROADMAP.md)
 - [Kế hoạch backend](docs/BACKEND_PLAN.md)
+- [Thiết kế database schema](docs/DATABASE_SCHEMA.md)
+- [API contract backend](docs/API_CONTRACT.md)
+- [Security plan](docs/SECURITY_PLAN.md)
+- [Task backend](docs/BACKEND_TASKS.md)
 - [Bước tiếp theo](docs/NEXT_STEPS.md)
 
 ## Deploy Vercel

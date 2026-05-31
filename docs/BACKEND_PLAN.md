@@ -2,6 +2,13 @@
 
 Tài liệu này chỉ lập kế hoạch backend, chưa triển khai code backend.
 
+## Tài liệu chi tiết liên quan
+
+- [Thiết kế database schema](DATABASE_SCHEMA.md)
+- [API contract backend](API_CONTRACT.md)
+- [Security plan](SECURITY_PLAN.md)
+- [Task backend](BACKEND_TASKS.md)
+
 ## A. Stack backend đề xuất
 
 Ưu tiên đề xuất: Node.js + Express + Prisma + PostgreSQL.
