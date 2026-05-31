@@ -51,7 +51,7 @@ phimhay-tv-base/
 ## Vai trò từng phần
 
 - `index.html`: Khung HTML chính, giữ header, footer, search overlay, vùng `<main id="app"></main>`, CSS hiện tại và script module `/src/main.js`.
-- `vercel.json`: Cấu hình Vercel cho SPA, rewrite mọi route về `/index.html` để reload URL con không bị 404.
+- `vercel.json`: Cấu hình Vercel cho SPA, rewrite mọi route về `/index.html` để reload URL con không bị 404. Demo production hiện ở `https://phimhay-tv.vercel.app/`.
 - `css/style.css`: Toàn bộ giao diện hiện tại theo phong cách dark cinematic V1, dùng CSS variables và các nhóm style rõ ràng cho base, header, hero, movie card, listing, detail, player, search, account và responsive.
 - `src/main.js`: Điểm khởi động app, import data/router/features, expose tạm các handler cần cho inline `onclick`, khởi tạo event và render ban đầu.
 - `src/data/movies.js`: Dữ liệu mẫu phim và user mock, export qua `movies` và `user`.
@@ -89,7 +89,7 @@ phimhay-tv-base/
 7. Sau mỗi lần render route, `utils/seo.js` cập nhật title, description và canonical.
 8. `features/search.js`, `features/watchlist.js`, `features/history.js` xử lý tìm kiếm overlay, danh sách lưu và lịch sử xem.
 9. `utils/storage.js` lưu watchlist/history vào `localStorage` để reload không mất dữ liệu.
-10. Khi deploy Vercel, `vercel.json` rewrite mọi request về `index.html`; app tự parse URL và render route đúng.
+10. Khi deploy Vercel, `vercel.json` rewrite mọi request về `index.html`; app tự parse URL và render route đúng. Link demo hiện tại là `https://phimhay-tv.vercel.app/`.
 
 ## Route URL hiện có
 
