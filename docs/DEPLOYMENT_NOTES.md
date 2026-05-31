@@ -1,5 +1,7 @@
 # Ghi chú deploy Vercel
 
+Production Vercel hiện tại: https://phimhay-tv.vercel.app/
+
 ## Vì sao cần `vercel.json`
 
 PhimHay TV đang dùng History API routing. Khi người dùng mở trực tiếp hoặc reload các URL như `/phim-le`, `/phim/bong-dem-sai-gon` hoặc `/xem/bong-dem-sai-gon/tap-1`, server production cần trả về `index.html` để JavaScript của app tự parse URL và render đúng view.
@@ -15,6 +17,16 @@ File `vercel.json` cấu hình rewrite toàn bộ request về `/index.html`, gi
 - `/xem/bong-dem-sai-gon/tap-1`
 - `/tim-kiem?q=hanh%20dong`
 - `/abc`
+
+## Route đã test sau deploy
+
+- https://phimhay-tv.vercel.app/
+- https://phimhay-tv.vercel.app/phim-le
+- https://phimhay-tv.vercel.app/phim-bo
+- https://phimhay-tv.vercel.app/phim/bong-dem-sai-gon
+- https://phimhay-tv.vercel.app/xem/bong-dem-sai-gon/tap-1
+- https://phimhay-tv.vercel.app/tim-kiem?q=hanh%20dong
+- https://phimhay-tv.vercel.app/abc
 
 ## Cách kiểm tra production
 

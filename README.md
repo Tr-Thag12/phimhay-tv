@@ -2,7 +2,9 @@
 
 Đây là base project front-end cho website xem phim PhimHay TV. Project đang chạy bằng Vite, HTML/CSS/JavaScript thuần và vẫn là frontend mock, chưa có backend/database.
 
-Branch chuẩn bị deploy Vercel của bước này: `feature/deploy-vercel`.
+Demo Vercel: https://phimhay-tv.vercel.app/
+
+Branch cập nhật tài liệu demo của bước này: `docs/cap-nhat-link-demo-vercel`.
 
 ```txt
 phimhay-tv-base/
@@ -62,7 +64,23 @@ Preview bản build:
 npm run preview
 ```
 
+## Demo online
+
+Bản demo online đang chạy tại:
+
+```txt
+https://phimhay-tv.vercel.app/
+```
+
+Đây là bản frontend mock để xem giao diện, routing URL, search, watchlist/history bằng `localStorage` và player giả lập. Project chưa có backend, database, admin hoặc đăng nhập thật.
+
 ## Deploy Vercel
+
+Production hiện tại:
+
+```txt
+https://phimhay-tv.vercel.app/
+```
 
 Có thể deploy demo bằng Vercel Dashboard:
 
