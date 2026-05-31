@@ -38,17 +38,20 @@ phimhay-tv-base/
 ├─ assets/
 ├─ docs/
 │  ├─ UI_REDESIGN_NOTES.md
-│  └─ ROUTING_SEO_NOTES.md
+│  ├─ ROUTING_SEO_NOTES.md
+│  └─ DEPLOYMENT_NOTES.md
 ├─ BACKEND_PLAN.md
 ├─ TODO.md
 ├─ README.md
 ├─ package.json
+├─ vercel.json
 └─ vite.config.mjs
 ```
 
 ## Vai trò từng phần
 
 - `index.html`: Khung HTML chính, giữ header, footer, search overlay, vùng `<main id="app"></main>`, CSS hiện tại và script module `/src/main.js`.
+- `vercel.json`: Cấu hình Vercel cho SPA, rewrite mọi route về `/index.html` để reload URL con không bị 404.
 - `css/style.css`: Toàn bộ giao diện hiện tại theo phong cách dark cinematic V1, dùng CSS variables và các nhóm style rõ ràng cho base, header, hero, movie card, listing, detail, player, search, account và responsive.
 - `src/main.js`: Điểm khởi động app, import data/router/features, expose tạm các handler cần cho inline `onclick`, khởi tạo event và render ban đầu.
 - `src/data/movies.js`: Dữ liệu mẫu phim và user mock, export qua `movies` và `user`.
@@ -72,6 +75,8 @@ phimhay-tv-base/
 - `src/features/watchlist.js`: Logic thêm/xóa watchlist, lưu qua `localStorage`.
 - `src/features/history.js`: Logic history xem phim, lưu qua `localStorage`.
 - `docs/UI_REDESIGN_NOTES.md`: Ghi chú tiếng Việt về hướng thiết kế giao diện V1 và những điểm cần cải thiện ở bước sau.
+- `docs/ROUTING_SEO_NOTES.md`: Ghi chú route, slug và SEO meta cơ bản.
+- `docs/DEPLOYMENT_NOTES.md`: Ghi chú deploy Vercel, route cần kiểm tra và lý do chưa dùng GitHub Pages ở bước này.
 
 ## Luồng chạy hiện tại
 
@@ -84,6 +89,7 @@ phimhay-tv-base/
 7. Sau mỗi lần render route, `utils/seo.js` cập nhật title, description và canonical.
 8. `features/search.js`, `features/watchlist.js`, `features/history.js` xử lý tìm kiếm overlay, danh sách lưu và lịch sử xem.
 9. `utils/storage.js` lưu watchlist/history vào `localStorage` để reload không mất dữ liệu.
+10. Khi deploy Vercel, `vercel.json` rewrite mọi request về `index.html`; app tự parse URL và render route đúng.
 
 ## Route URL hiện có
 
