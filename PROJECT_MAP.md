@@ -37,6 +37,11 @@ phimhay-tv-base/
 │     └─ history.js
 ├─ assets/
 ├─ docs/
+│  ├─ PROJECT_STATUS.md
+│  ├─ USER_FLOWS.md
+│  ├─ FEATURE_ROADMAP.md
+│  ├─ BACKEND_PLAN.md
+│  ├─ NEXT_STEPS.md
 │  ├─ UI_REDESIGN_NOTES.md
 │  ├─ ROUTING_SEO_NOTES.md
 │  └─ DEPLOYMENT_NOTES.md
@@ -74,6 +79,11 @@ phimhay-tv-base/
 - `src/features/search.js`: Logic search overlay và render kết quả tìm kiếm.
 - `src/features/watchlist.js`: Logic thêm/xóa watchlist, lưu qua `localStorage`.
 - `src/features/history.js`: Logic history xem phim, lưu qua `localStorage`.
+- `docs/PROJECT_STATUS.md`: Tổng kết trạng thái hiện tại của dự án, phần đã xong và phần chưa có.
+- `docs/USER_FLOWS.md`: Danh sách luồng thao tác cho khách, người dùng đăng nhập, admin và hệ thống.
+- `docs/FEATURE_ROADMAP.md`: Roadmap phát triển theo từng giai đoạn từ frontend mock đến production.
+- `docs/BACKEND_PLAN.md`: Kế hoạch backend đề xuất, bảng dữ liệu và API endpoint.
+- `docs/NEXT_STEPS.md`: Thứ tự việc nên làm tiếp theo theo mức ưu tiên.
 - `docs/UI_REDESIGN_NOTES.md`: Ghi chú tiếng Việt về hướng thiết kế giao diện V1 và những điểm cần cải thiện ở bước sau.
 - `docs/ROUTING_SEO_NOTES.md`: Ghi chú route, slug và SEO meta cơ bản.
 - `docs/DEPLOYMENT_NOTES.md`: Ghi chú deploy Vercel, route cần kiểm tra và lý do chưa dùng GitHub Pages ở bước này.
