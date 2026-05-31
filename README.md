@@ -24,6 +24,11 @@ phimhay-tv-base/
 ├─ TODO.md
 ├─ PROJECT_MAP.md
 ├─ docs/
+│  ├─ PROJECT_STATUS.md
+│  ├─ USER_FLOWS.md
+│  ├─ FEATURE_ROADMAP.md
+│  ├─ BACKEND_PLAN.md
+│  ├─ NEXT_STEPS.md
 │  ├─ UI_REDESIGN_NOTES.md
 │  ├─ ROUTING_SEO_NOTES.md
 │  └─ DEPLOYMENT_NOTES.md
@@ -73,6 +78,14 @@ https://phimhay-tv.vercel.app/
 ```
 
 Đây là bản frontend mock để xem giao diện, routing URL, search, watchlist/history bằng `localStorage` và player giả lập. Project chưa có backend, database, admin hoặc đăng nhập thật.
+
+## Tài liệu dự án
+
+- [Trạng thái dự án](docs/PROJECT_STATUS.md)
+- [Luồng người dùng](docs/USER_FLOWS.md)
+- [Roadmap chức năng](docs/FEATURE_ROADMAP.md)
+- [Kế hoạch backend](docs/BACKEND_PLAN.md)
+- [Bước tiếp theo](docs/NEXT_STEPS.md)
 
 ## Deploy Vercel
 
