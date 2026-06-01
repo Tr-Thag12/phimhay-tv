@@ -263,7 +263,7 @@ function updateMetaForCurrentRoute() {
   if (state.page === 'account') {
     updateSeoMeta({
       title: 'Tài khoản - PhimHay TV',
-      description: 'Trang tài khoản mock của PhimHay TV, gồm hồ sơ, danh sách lưu và lịch sử xem.',
+      description: 'Đăng nhập, đăng ký và quản lý thông tin tài khoản PhimHay TV qua Auth API local.',
       canonicalPath
     });
     return;

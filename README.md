@@ -196,7 +196,7 @@ GET /api/auth/me
 POST /api/auth/logout
 ```
 
-Auth dùng JWT Bearer token. Giao diện đăng nhập/đăng ký frontend chưa nối ở bước này.
+Auth dùng JWT Bearer token. Frontend đã có form đăng nhập/đăng ký tại `/tai-khoan` và lưu JWT bằng `sessionStorage`.
 
 Database local bằng Docker Compose:
 
@@ -234,6 +234,51 @@ Luồng dữ liệu chính:
 
 Khi muốn test đúng luồng API, chạy backend trước ở `http://localhost:4000`, sau đó chạy frontend ở `http://localhost:5173`.
 
+## Frontend auth local
+
+Trang `/tai-khoan` đã nối với Auth API backend local cho đăng nhập, đăng ký, lấy thông tin người dùng hiện tại và đăng xuất.
+
+Chạy database:
+
+```bash
+cd server
+npm run db:up
+docker compose ps
+```
+
+Chạy backend:
+
+```bash
+cd server
+npm install
+npx prisma migrate reset --force
+npm run prisma:generate
+npm run db:seed
+npm run start
+```
+
+Chạy frontend:
+
+```bash
+npm install
+npm run dev
+```
+
+Mở:
+
+```txt
+http://localhost:5173/tai-khoan
+```
+
+Tài khoản test local:
+
+- `admin@phimhay.local` / `Admin@123456`
+- `user@phimhay.local` / `User@123456`
+
+Token frontend hiện lưu trong `sessionStorage` với key `phimhay_auth_token`. Khi reload tab, app đọc token và gọi `/api/auth/me` để khôi phục user. Khi logout hoặc token sai/hết hạn, app xóa token và quay về trạng thái chưa đăng nhập.
+
+Backend production chưa deploy, nên demo Vercel hiện chưa đăng nhập thật được. Watchlist/history vẫn dùng `localStorage` và chưa đồng bộ theo tài khoản ở bước này.
+
 ## Tài liệu dự án
 
 - [Trạng thái dự án](docs/PROJECT_STATUS.md)
@@ -248,6 +293,7 @@ Khi muốn test đúng luồng API, chạy backend trước ở `http://localhos
 - [Nối frontend với API public](docs/FRONTEND_API_INTEGRATION.md)
 - [Chạy fullstack local](docs/FULLSTACK_LOCAL_GUIDE.md)
 - [Ghi chú Auth backend](docs/AUTH_BACKEND_NOTES.md)
+- [Ghi chú Frontend auth](docs/FRONTEND_AUTH_NOTES.md)
 - [Backend skeleton](server/README.md)
 
 ## Deploy Vercel
@@ -278,11 +324,12 @@ Ghi chú:
 - Trang danh sách phim + bộ lọc
 - Trang chi tiết phim + tab
 - Trang xem phim/player giả lập
-- Trang tài khoản mock
+- Trang tài khoản có đăng nhập/đăng ký/logout qua Auth API local
 - Tìm kiếm overlay
 - URL routing bằng History API, không dùng hash route
 - SEO meta cơ bản: `document.title`, meta description và canonical theo route
 - Frontend gọi API public cho phim, thể loại, chi tiết phim, tập phim, search và tăng lượt xem
+- Frontend gọi Auth API cho đăng nhập, đăng ký, me và logout
 - Fallback về dữ liệu mock nếu backend local không chạy
 - Lưu phim bằng `localStorage`
 - Lịch sử xem bằng `localStorage`
@@ -298,7 +345,7 @@ Ghi chú:
 - `/phim/:slug`: Chi tiết phim
 - `/xem/:slug/tap-:episode`: Player giả lập
 - `/tim-kiem?q=keyword`: Trang kết quả tìm kiếm
-- `/tai-khoan`: Tài khoản mock
+- `/tai-khoan`: Tài khoản, đăng nhập và đăng ký
 
 ## Ghi chú phát triển
 
@@ -307,4 +354,4 @@ Ghi chú:
 - Luồng render chính bắt đầu từ `src/main.js`, qua `src/router/router.js`, đọc URL hiện tại rồi tới các file view trong `src/render/`.
 - Search, watchlist và history nằm trong `src/features/`.
 - Giao diện chính nằm trong `css/style.css`, dùng CSS variables và chia nhóm style theo base, header, hero, card phim, listing, detail, player, search, account và responsive.
-- Backend hiện có health check, Docker Compose PostgreSQL local, Prisma migration đầu tiên, seed dữ liệu mẫu, API public và Auth API cơ bản trong `server/`. Frontend đã nối API public, nhưng chưa nối giao diện đăng nhập/đăng ký và chưa có admin CRUD.
+- Backend hiện có health check, Docker Compose PostgreSQL local, Prisma migration đầu tiên, seed dữ liệu mẫu, API public và Auth API cơ bản trong `server/`. Frontend đã nối API public và Auth API cơ bản, nhưng chưa có admin CRUD.
