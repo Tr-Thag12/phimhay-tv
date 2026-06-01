@@ -18,15 +18,17 @@ export function setWatchlist(ids) {
 }
 
 export function isSaved(movieId) {
-  return getWatchlist().includes(Number(movieId));
+  return getWatchlist().some(id => String(id) === String(movieId));
 }
 
 export function toggleSave(movieId, event) {
   if (event) event.stopPropagation();
 
-  const id = Number(movieId);
+  const id = movieId;
   const ids = getWatchlist();
-  const next = ids.includes(id) ? ids.filter(item => item !== id) : [id, ...ids];
+  const next = ids.some(item => String(item) === String(id))
+    ? ids.filter(item => String(item) !== String(id))
+    : [id, ...ids];
 
   setWatchlist(next);
   onWatchlistChange();

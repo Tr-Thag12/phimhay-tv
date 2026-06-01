@@ -1,4 +1,4 @@
-import { movies } from '../data/movies.js';
+import { findCachedMovieById, getCachedMovies } from '../data/movieRepository.js';
 import { qsa } from '../utils/dom.js';
 import { escapeHTML } from '../utils/format.js';
 import { imageFallbackAttr } from '../utils/imageFallback.js';
@@ -6,7 +6,7 @@ import { detailUrl, watchUrl } from '../utils/slug.js';
 import { isSaved } from '../features/watchlist.js';
 
 export function movieById(id) {
-  return movies.find(movie => movie.id === Number(id)) || movies[0];
+  return findCachedMovieById(id) || getCachedMovies()[0];
 }
 
 export function icon(name) {
@@ -33,6 +33,7 @@ export function renderEmptyState(message, attrs = '') {
 
 export function renderMovieCard(movie) {
   const saved = isSaved(movie.id);
+  const movieId = JSON.stringify(movie.id);
 
   return `
     <article class="movie-card">
@@ -50,7 +51,7 @@ export function renderMovieCard(movie) {
       <div class="card-overlay">
         <div class="card-small-actions">
           <a class="round-btn red" href="${watchUrl(movie)}" aria-label="Xem phim">${icon('play')}</a>
-          <button class="round-btn ${saved ? 'active' : ''}" type="button" aria-label="${saved ? 'Bỏ lưu' : 'Lưu phim'}" onclick="toggleSave(${movie.id}, event)">${icon('bookmark')}</button>
+          <button class="round-btn ${saved ? 'active' : ''}" type="button" aria-label="${saved ? 'Bỏ lưu' : 'Lưu phim'}" onclick="toggleSave(${movieId}, event)">${icon('bookmark')}</button>
         </div>
         <a href="${detailUrl(movie)}"><strong>${escapeHTML(movie.title)}</strong></a>
         <small>${escapeHTML(movie.description.slice(0, 82))}...</small>

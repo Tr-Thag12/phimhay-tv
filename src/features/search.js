@@ -1,4 +1,4 @@
-import { movies } from '../data/movies.js';
+import { getCachedMovies } from '../data/movieRepository.js';
 import { qs, createIcons } from '../utils/dom.js';
 import { escapeHTML } from '../utils/format.js';
 import { imageFallbackAttr } from '../utils/imageFallback.js';
@@ -16,7 +16,7 @@ export function closeSearch() {
 
 export function renderSearchResults(keyword = '') {
   const kw = slugify(keyword);
-  const results = movies
+  const results = getCachedMovies()
     .filter(movie => !kw || slugify(`${movie.title} ${movie.genres.join(' ')} ${movie.country}`).includes(kw))
     .slice(0, 6);
   const searchResults = qs('#search-results');

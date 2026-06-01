@@ -15,7 +15,15 @@ const state = {
   season: 1,
   searchKeyword: '',
   notFoundMessage: '',
-  activeRoute: 'home'
+  activeRoute: 'home',
+  routeMovies: [],
+  searchResults: [],
+  currentMovie: null,
+  currentEpisodes: [],
+  categories: [],
+  isLoading: false,
+  dataSource: 'mock',
+  dataError: null
 };
 
 export function getState() {
