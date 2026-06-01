@@ -1,5 +1,6 @@
 import { getHistory } from '../features/history.js';
 import { getWatchlist } from '../features/watchlist.js';
+import { getUserLibraryStatus } from '../data/userLibraryRepository.js';
 import {
   getAuthState,
   login as loginAuth,
@@ -65,6 +66,20 @@ function renderDevAccounts() {
   </div>`;
 }
 
+function libraryNote(auth) {
+  const status = getUserLibraryStatus();
+
+  if (!auth.isAuthenticated) {
+    return 'Đăng nhập để đồng bộ danh sách yêu thích và lịch sử xem theo tài khoản. Khi chưa đăng nhập, dữ liệu vẫn lưu trên trình duyệt bằng localStorage.';
+  }
+
+  if (status.isBackendSynced) {
+    return 'Danh sách yêu thích và lịch sử xem đang đồng bộ theo tài khoản.';
+  }
+
+  return 'Backend thư viện chưa khả dụng nên danh sách yêu thích và lịch sử xem đang tạm dùng localStorage fallback.';
+}
+
 function renderLoggedOut(app) {
   const state = getState();
   const auth = getAuthState();
@@ -74,7 +89,7 @@ function renderLoggedOut(app) {
     <div class="auth-page-head">
       <p class="eyebrow">Tài khoản PhimHay TV</p>
       <h1>Đăng nhập để dùng hồ sơ thật</h1>
-      <p class="muted">Auth frontend đang gọi backend local qua JWT Bearer token. Watchlist và lịch sử xem vẫn lưu trên trình duyệt trong bước này.</p>
+      <p class="muted">Auth frontend đang gọi backend local qua JWT Bearer token. ${escapeHTML(libraryNote(auth))}</p>
     </div>
 
     <div class="auth-shell">
@@ -133,7 +148,7 @@ function renderLoggedIn(app) {
   const auth = getAuthState();
   const currentUser = auth.user;
   const watchlist = getWatchlist().map(movieById);
-  const history = getHistory().map(item => ({ ...item, movie: movieById(item.movieId) }));
+  const history = getHistory().map(item => ({ ...item, movie: item.movie || movieById(item.movieId) }));
   const tabs = [
     ['profile', 'Hồ sơ'],
     ['watchlist', 'Danh sách của tôi'],
@@ -173,7 +188,7 @@ function renderLoggedIn(app) {
             <div class="account-card"><span class="muted">Ngày tạo</span><h3>${formatUserDate(currentUser.createdAt)}</h3></div>
             <div class="account-card"><span class="muted">Cập nhật</span><h3>${formatUserDate(currentUser.updatedAt)}</h3></div>
           </div>
-          <div class="account-note">${icon('info')} Watchlist/history hiện vẫn lưu trên trình duyệt. Đồng bộ theo tài khoản sẽ làm ở bước sau.</div>
+          <div class="account-note">${icon('info')} ${escapeHTML(libraryNote(auth))}</div>
         </div>
         <div class="account-panel ${state.accountTab === 'watchlist' ? 'active' : ''}"><div class="movie-grid">${watchlist.length ? watchlist.map(movie => renderMovieCard(movie)).join('') : `<div class="empty-state" style="grid-column:1/-1"><span>${icon('bookmark')}</span><strong>Chưa lưu phim nào.</strong></div>`}</div></div>
         <div class="account-panel ${state.accountTab === 'history' ? 'active' : ''}">${history.length ? history.map(item => `<a class="history-item" href="${watchUrl(item.movie, item.episodeId)}"><img src="${item.movie.backdrop}" alt="${escapeHTML(item.movie.title)}" width="260" height="146" loading="lazy" decoding="async" ${imageFallbackAttr('backdrop')}><div style="flex:1"><strong>${escapeHTML(item.movie.title)}</strong><p class="muted">Đã xem ${item.progress}%</p><div class="bar"><span style="width:${item.progress}%"></span></div></div></a>`).join('') : `<div class="empty-state"><span>${icon('history')}</span><strong>Chưa có lịch sử xem.</strong></div>`}</div>

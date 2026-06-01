@@ -78,6 +78,10 @@ function mergeMovies(items = []) {
   return items.map(stableMovieId);
 }
 
+export function cacheMovies(items = []) {
+  return mergeMovies(items);
+}
+
 function localFilter(query = {}) {
   const keyword = slugify(query.q || query.keyword || '');
   const type = query.type === 'SERIES' ? 'series' : query.type === 'MOVIE' ? 'movie' : query.type;
@@ -128,7 +132,7 @@ export function getLastDataError() {
 }
 
 export function findCachedMovieById(id) {
-  return getCachedMovies().find(movie => String(movie.id) === String(id))
+  return getCachedMovies().find(movie => String(movie.id) === String(id) || String(movie.apiId) === String(id))
     || mockMovies.find(movie => String(movie.id) === String(id))
     || null;
 }

@@ -12,6 +12,7 @@ import {
   loadMoviesByCategory,
   searchMovies
 } from '../data/movieRepository.js';
+import { refreshUserLibrary } from '../data/userLibraryRepository.js';
 import { addHistoryItem } from '../features/history.js';
 import { closeSearch } from '../features/search.js';
 import { renderAccount } from '../render/accountView.js';
@@ -198,7 +199,7 @@ async function parseCurrentRoute() {
     state.currentEpisodes = episodes;
     state.currentEpisodeId = episode?.id || null;
     state.season = episode?.season || 1;
-    addHistoryItem(movie.id, state.currentEpisodeId);
+    await addHistoryItem(movie.id, state.currentEpisodeId);
     increaseMovieView(movieSlug(movie));
     return;
   }
@@ -310,6 +311,7 @@ export async function applyCurrentRoute(options = {}) {
 
   try {
     await parseCurrentRoute();
+    await refreshUserLibrary();
   } catch (error) {
     setNotFound('Không tải được dữ liệu cho đường dẫn này. Ứng dụng sẽ thử dùng dữ liệu mẫu nếu có.');
     console.error(error);

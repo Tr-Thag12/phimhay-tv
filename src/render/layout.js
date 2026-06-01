@@ -93,7 +93,7 @@ export function renderMovieCard(movie) {
       <div class="card-overlay">
         <div class="card-small-actions">
           <a class="round-btn red" href="${watchUrl(movie)}" aria-label="Xem phim">${icon('play')}</a>
-          <button class="round-btn ${saved ? 'active' : ''}" type="button" aria-label="${saved ? 'Bỏ lưu' : 'Lưu phim'}" onclick="toggleSave(${movieId}, event)">${icon('bookmark')}</button>
+          <button class="round-btn ${saved ? 'active' : ''}" type="button" aria-label="${saved ? 'Bỏ lưu' : 'Lưu phim'}" onclick='toggleSave(${movieId}, event)'>${icon('bookmark')}</button>
         </div>
         <a href="${detailUrl(movie)}"><strong>${escapeHTML(movie.title)}</strong></a>
         <small>${escapeHTML(movie.description.slice(0, 82))}...</small>
