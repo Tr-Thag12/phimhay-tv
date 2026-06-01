@@ -1,4 +1,4 @@
-import { movies } from '../data/movies.js';
+import { getCachedMovies } from '../data/movieRepository.js';
 import { getState } from '../state/store.js';
 import { escapeHTML, stars, typeLabel } from '../utils/format.js';
 import { imageFallbackAttr } from '../utils/imageFallback.js';
@@ -8,11 +8,13 @@ import { icon, movieById, renderMovieCard } from './layout.js';
 
 export function renderDetail(app) {
   const state = getState();
-  const movie = movieById(state.selectedMovieId);
+  const movies = getCachedMovies();
+  const movie = state.currentMovie || movieById(state.selectedMovieId);
+  const movieId = JSON.stringify(movie.id);
   const seasons = [...new Set((movie.episodes || []).map(ep => ep.season))];
   const seasonEpisodes = (movie.episodes || []).filter(ep => ep.season === state.season);
   const similar = movies
-    .filter(item => item.id !== movie.id && item.genres.some(genre => movie.genres.includes(genre)))
+    .filter(item => String(item.id) !== String(movie.id) && item.genres.some(genre => movie.genres.includes(genre)))
     .slice(0, 8);
 
   app.innerHTML = `<div class="detail-page">
@@ -29,7 +31,7 @@ export function renderDetail(app) {
           <div class="actions">
             <a class="btn btn-primary" href="${watchUrl(movie)}">${icon('play')} Xem ngay</a>
             <button class="btn btn-ghost" onclick="setDetailTab('trailer')">${icon('film')} Trailer</button>
-            <button class="btn btn-ghost" onclick="toggleSave(${movie.id}, event)">${icon(isSaved(movie.id) ? 'bookmark-check' : 'bookmark')} ${isSaved(movie.id) ? 'Đã lưu' : 'Thêm vào danh sách'}</button>
+            <button class="btn btn-ghost" onclick="toggleSave(${movieId}, event)">${icon(isSaved(movie.id) ? 'bookmark-check' : 'bookmark')} ${isSaved(movie.id) ? 'Đã lưu' : 'Thêm vào danh sách'}</button>
             <button class="btn btn-ghost">${icon('share-2')} Chia sẻ</button>
           </div>
           <div class="info-grid">

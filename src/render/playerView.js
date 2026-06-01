@@ -1,4 +1,4 @@
-import { movies } from '../data/movies.js';
+import { getCachedMovies } from '../data/movieRepository.js';
 import { getState } from '../state/store.js';
 import { escapeHTML } from '../utils/format.js';
 import { imageFallbackAttr } from '../utils/imageFallback.js';
@@ -7,10 +7,11 @@ import { icon, movieById, renderMovieCard } from './layout.js';
 
 export function renderPlayer(app) {
   const state = getState();
-  const movie = movieById(state.selectedMovieId);
-  const episodes = movie.episodes || [];
-  const episode = episodes.find(ep => ep.id === state.currentEpisodeId) || episodes[0];
-  const episodeIndex = episode ? episodes.findIndex(ep => ep.id === episode.id) : -1;
+  const movies = getCachedMovies();
+  const movie = state.currentMovie || movieById(state.selectedMovieId);
+  const episodes = state.currentEpisodes?.length ? state.currentEpisodes : movie.episodes || [];
+  const episode = episodes.find(ep => String(ep.id) === String(state.currentEpisodeId)) || episodes[0];
+  const episodeIndex = episode ? episodes.findIndex(ep => String(ep.id) === String(episode.id)) : -1;
   const previousEpisode = episodeIndex > 0 ? episodes[episodeIndex - 1] : null;
   const nextEpisode = episodeIndex >= 0 && episodeIndex < episodes.length - 1 ? episodes[episodeIndex + 1] : null;
 
@@ -39,8 +40,8 @@ export function renderPlayer(app) {
           <button class="btn btn-danger">${icon('alert-triangle')} Báo lỗi phim</button>
         </div>
       </div>
-      <aside><h3>Danh sách tập</h3><div class="episode-list">${episodes.length ? episodes.map(ep => `<a class="episode-row ${ep.id === state.currentEpisodeId ? 'active' : ''}" href="${watchUrl(movie, ep.id)}"><strong>${String(ep.number).padStart(2,'0')}</strong><span>${escapeHTML(ep.title)} • ${ep.duration}</span>${ep.id === state.currentEpisodeId ? '<small>Đang xem</small>' : ''}</a>`).join('') : `<div class="empty-state"><span>${icon('film')}</span><strong>Phim lẻ</strong></div>`}</div></aside>
+      <aside><h3>Danh sách tập</h3><div class="episode-list">${episodes.length ? episodes.map(ep => `<a class="episode-row ${String(ep.id) === String(state.currentEpisodeId) ? 'active' : ''}" href="${watchUrl(movie, ep.id)}"><strong>${String(ep.number).padStart(2,'0')}</strong><span>${escapeHTML(ep.title)} • ${ep.duration}</span>${String(ep.id) === String(state.currentEpisodeId) ? '<small>Đang xem</small>' : ''}</a>`).join('') : `<div class="empty-state"><span>${icon('film')}</span><strong>Phim lẻ</strong></div>`}</div></aside>
     </div>
-    <div class="container section"><h2 class="section-title">Có thể bạn cũng thích</h2><div class="scroll-row">${movies.filter(item => item.id !== movie.id).slice(0,8).map(item => renderMovieCard(item)).join('')}</div></div>
+    <div class="container section"><h2 class="section-title">Có thể bạn cũng thích</h2><div class="scroll-row">${movies.filter(item => String(item.id) !== String(movie.id)).slice(0,8).map(item => renderMovieCard(item)).join('')}</div></div>
   </div>`;
 }

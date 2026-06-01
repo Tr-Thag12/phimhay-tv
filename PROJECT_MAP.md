@@ -11,6 +11,10 @@ phimhay-tv-base/
 │  ├─ main.js
 │  ├─ data/
 │  │  └─ movies.js
+│  ├─ services/
+│  │  ├─ apiClient.js
+│  │  ├─ movieApi.js
+│  │  └─ movieAdapter.js
 │  ├─ state/
 │  │  └─ store.js
 │  ├─ router/
@@ -84,10 +88,12 @@ phimhay-tv-base/
 │  ├─ NEXT_STEPS.md
 │  ├─ UI_REDESIGN_NOTES.md
 │  ├─ ROUTING_SEO_NOTES.md
+│  ├─ FRONTEND_API_INTEGRATION.md
 │  └─ DEPLOYMENT_NOTES.md
 ├─ BACKEND_PLAN.md
 ├─ TODO.md
 ├─ README.md
+├─ .env.example
 ├─ package.json
 ├─ vercel.json
 └─ vite.config.mjs
@@ -96,6 +102,7 @@ phimhay-tv-base/
 ## Vai trò từng phần
 
 - `index.html`: Khung HTML chính, giữ header, footer, search overlay, vùng `<main id="app"></main>`, CSS hiện tại và script module `/src/main.js`.
+- `.env.example`: Biến môi trường mẫu cho frontend, hiện có `VITE_API_BASE_URL=http://localhost:4000/api`.
 - `vercel.json`: Cấu hình Vercel cho SPA, rewrite mọi route về `/index.html` để reload URL con không bị 404. Demo production hiện ở `https://phimhay-tv.vercel.app/`.
 - `server/`: Backend Node.js + Express + Prisma, chạy riêng với frontend. Hiện có health check, API public đầu tiên, middleware lỗi cơ bản, PostgreSQL local bằng Docker Compose, Prisma migration đầu tiên, seed dữ liệu mẫu và tài liệu chạy backend.
 - `server/package.json`: Package backend riêng, có script `dev`, `start`, `db:up`, `db:down`, `db:logs`, `db:migrate`, `db:seed`, `db:studio`, `prisma:generate` và `prisma:studio`.
@@ -124,9 +131,13 @@ phimhay-tv-base/
 - `server/src/utils/pagination.js`: Helper parse `page`, `limit` và tạo metadata phân trang cho API.
 - `css/style.css`: Toàn bộ giao diện hiện tại theo phong cách dark cinematic V1, dùng CSS variables và các nhóm style rõ ràng cho base, header, hero, movie card, listing, detail, player, search, account và responsive.
 - `src/main.js`: Điểm khởi động app, import data/router/features, expose tạm các handler cần cho inline `onclick`, khởi tạo event và render ban đầu.
-- `src/data/movies.js`: Dữ liệu mẫu phim và user mock, export qua `movies` và `user`.
-- `src/state/store.js`: State runtime của app như page hiện tại, phim đang chọn, tập đang xem, tab chi tiết, tab account, từ khóa search, trạng thái 404 và bộ lọc listing.
-- `src/router/router.js`: Router URL thật bằng History API. File này intercept link nội bộ, gọi `pushState`, parse path hiện tại, cập nhật state, render view tương ứng và cập nhật SEO meta.
+- `src/data/movies.js`: Dữ liệu mẫu phim và user mock, export qua `movies` và `user`; dữ liệu này vẫn được giữ làm fallback khi backend không khả dụng.
+- `src/data/movieRepository.js`: Repository dữ liệu frontend, ưu tiên gọi API public backend, cache dữ liệu đã tải và fallback về `src/data/movies.js` khi API lỗi hoặc backend tắt.
+- `src/services/apiClient.js`: Client gọi API dùng `VITE_API_BASE_URL`, parse JSON response và ném lỗi thống nhất khi backend trả lỗi.
+- `src/services/movieApi.js`: Nhóm hàm gọi API public `/movies`, `/categories`, `/search` và tăng lượt xem.
+- `src/services/movieAdapter.js`: Chuyển dữ liệu backend sang shape cũ mà các view đang dùng như `poster`, `backdrop`, `genres`, `episodes`, `rating`.
+- `src/state/store.js`: State runtime của app như page hiện tại, phim đang chọn, tập đang xem, tab chi tiết, tab account, từ khóa search, trạng thái 404, bộ lọc listing, dữ liệu route hiện tại, kết quả search, nguồn dữ liệu và lỗi API gần nhất.
+- `src/router/router.js`: Router URL thật bằng History API. File này intercept link nội bộ, gọi `pushState`, parse path hiện tại, tải dữ liệu async qua `movieRepository`, cập nhật state, render view tương ứng và cập nhật SEO meta.
 - `src/utils/storage.js`: Helper đọc/ghi/xóa `localStorage` an toàn bằng JSON, trả default value nếu dữ liệu lỗi.
 - `src/utils/dom.js`: Helper DOM như `qs`, `qsa`, `setHTML`, `onClick`, `createIcons`.
 - `src/utils/format.js`: Helper format/escape như `escapeHTML`, `stars`, `typeLabel`, `formatYear`, `formatDuration`, `formatRating`, `formatViewCount`.
@@ -155,15 +166,16 @@ phimhay-tv-base/
 - `docs/NEXT_STEPS.md`: Thứ tự việc nên làm tiếp theo theo mức ưu tiên.
 - `docs/UI_REDESIGN_NOTES.md`: Ghi chú tiếng Việt về hướng thiết kế giao diện V1 và những điểm cần cải thiện ở bước sau.
 - `docs/ROUTING_SEO_NOTES.md`: Ghi chú route, slug và SEO meta cơ bản.
+- `docs/FRONTEND_API_INTEGRATION.md`: Ghi chú cách frontend gọi API public, fallback về mock data và các route cần kiểm thử.
 - `docs/DEPLOYMENT_NOTES.md`: Ghi chú deploy Vercel, route cần kiểm tra và lý do chưa dùng GitHub Pages ở bước này.
 
 ## Luồng chạy hiện tại
 
 1. Trình duyệt tải `index.html`.
 2. `index.html` tải `css/style.css` và script module `/src/main.js`.
-3. `src/main.js` import dữ liệu, router, state, features và helper chung.
+3. `src/main.js` import dữ liệu mock, router, state, features và helper chung.
 4. Người dùng click link nội bộ như `/phim/:slug` hoặc `/xem/:slug/tap-1`.
-5. `router/router.js` intercept event, gọi `history.pushState()`, parse path hiện tại, cập nhật state rồi render view tương ứng trong `src/render/`.
+5. `router/router.js` intercept event, gọi `history.pushState()`, parse path hiện tại, tải dữ liệu qua `src/data/movieRepository.js`, cập nhật state rồi render view tương ứng trong `src/render/`.
 6. Khi bấm Back/Forward, listener `popstate` parse lại URL và render đúng view mà không reload trang.
 7. Sau mỗi lần render route, `utils/seo.js` cập nhật title, description và canonical.
 8. `features/search.js`, `features/watchlist.js`, `features/history.js` xử lý tìm kiếm overlay, danh sách lưu và lịch sử xem.
@@ -172,6 +184,7 @@ phimhay-tv-base/
 11. Backend chạy riêng trong `server/`; khi chạy `npm run start` trong thư mục này, Express mount route `GET /api/health` tại `http://localhost:4000/api/health`.
 12. Database dev chạy bằng `server/docker-compose.yml`; sau khi `npm run db:up`, Prisma dùng `DATABASE_URL` trong `server/.env` để migrate và seed dữ liệu mẫu.
 13. API public đầu tiên đọc dữ liệu từ PostgreSQL qua `server/src/lib/prisma.js`, đi qua routes trong `server/src/routes/`, controllers trong `server/src/controllers/` và services trong `server/src/services/`.
+14. Nếu backend local không chạy hoặc API trả lỗi, `movieRepository.js` tự dùng lại dữ liệu mock trong `src/data/movies.js` để giao diện vẫn hoạt động.
 
 ## Route URL hiện có
 
@@ -187,9 +200,10 @@ phimhay-tv-base/
 
 ## Phạm vi hiện tại
 
-- Đây vẫn là frontend mock chạy bằng Vite, HTML/CSS/JavaScript thuần; backend chạy riêng trong `server/`.
+- Đây vẫn là frontend Vite, HTML/CSS/JavaScript thuần; backend chạy riêng trong `server/`.
 - Đã có PostgreSQL local, migration đầu tiên và seed dữ liệu mẫu cho backend dev.
 - Đã có API public đầu tiên cho phim, thể loại và tìm kiếm.
+- Frontend đã nối API public cho danh sách phim, chi tiết phim, tập phim, search và tăng lượt xem; vẫn có fallback mock khi backend không khả dụng.
 - Chưa có admin hoặc đăng nhập thật.
 - Không đổi cấu trúc dữ liệu phim mẫu. Dữ liệu hiện được dùng chính qua export module, còn `window.MOVIES`/`window.USER` chỉ được expose tạm trong `src/main.js` để tương thích khi cần kiểm tra nhanh.
-- Chưa nên sửa lớn cấu trúc `src/data/movies.js`, watchlist/history trong `localStorage`, hoặc cách render view hiện tại nếu chưa sang bước backend/API.
+- Chưa nên sửa lớn cấu trúc `src/data/movies.js`, watchlist/history trong `localStorage`, hoặc cách render view hiện tại nếu chưa sang bước auth/admin.

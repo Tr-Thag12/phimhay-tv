@@ -1,4 +1,4 @@
-import { movies } from '../data/movies.js';
+import { getCachedMovies } from '../data/movieRepository.js';
 import { getState } from '../state/store.js';
 import { escapeHTML } from '../utils/format.js';
 import { slugify } from '../utils/slug.js';
@@ -8,7 +8,7 @@ function searchMovies(keyword) {
   const kw = slugify(keyword);
   if (!kw) return [];
 
-  return movies.filter(movie => {
+  return getCachedMovies().filter(movie => {
     const haystack = [
       movie.title,
       movie.originalTitle,
@@ -25,7 +25,7 @@ function searchMovies(keyword) {
 export function renderSearchPage(app) {
   const state = getState();
   const keyword = state.searchKeyword || '';
-  const results = searchMovies(keyword);
+  const results = keyword && state.searchResults?.length ? state.searchResults : searchMovies(keyword);
 
   app.innerHTML = `<div class="listing-page search-page container">
     <div class="section-head">

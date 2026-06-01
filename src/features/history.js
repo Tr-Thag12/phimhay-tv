@@ -15,8 +15,8 @@ export function setHistory(items) {
 }
 
 export function addHistoryItem(movieId, episodeId) {
-  const id = Number(movieId);
-  const history = getHistory().filter(item => item.movieId !== id);
+  const id = movieId;
+  const history = getHistory().filter(item => String(item.movieId) !== String(id));
   setHistory([
     {
       movieId: id,

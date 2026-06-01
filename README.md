@@ -1,10 +1,10 @@
 # PhimHay TV - Base Project
 
-Đây là base project cho website xem phim PhimHay TV. Frontend đang chạy bằng Vite, HTML/CSS/JavaScript thuần. Backend hiện có Node.js + Express + Prisma trong thư mục `server/`, kèm PostgreSQL local bằng Docker Compose, migration đầu tiên, seed dữ liệu mẫu và API public đầu tiên cho phim/thể loại/tìm kiếm. Frontend chưa nối với backend.
+Đây là base project cho website xem phim PhimHay TV. Frontend đang chạy bằng Vite, HTML/CSS/JavaScript thuần. Backend hiện có Node.js + Express + Prisma trong thư mục `server/`, kèm PostgreSQL local bằng Docker Compose, migration đầu tiên, seed dữ liệu mẫu và API public đầu tiên cho phim/thể loại/tìm kiếm. Frontend hiện đã gọi API public trước và tự fallback về dữ liệu mock khi backend không khả dụng.
 
 Demo Vercel: https://phimhay-tv.vercel.app/
 
-Branch thiết kế backend schema/API của bước này: `docs/thiet-ke-backend-schema-api`.
+Branch nối frontend API của bước này: `feature/connect-frontend-api`.
 
 ```txt
 phimhay-tv-base/
@@ -14,6 +14,7 @@ phimhay-tv-base/
 ├─ src/
 │  ├─ main.js
 │  ├─ data/
+│  ├─ services/
 │  ├─ state/
 │  ├─ router/
 │  ├─ utils/
@@ -67,6 +68,18 @@ Cài dependency:
 
 ```bash
 npm install
+```
+
+Tạo file môi trường frontend nếu muốn đổi API base URL:
+
+```bash
+Copy-Item .env.example .env
+```
+
+Mặc định frontend gọi backend local tại:
+
+```txt
+http://localhost:4000/api
 ```
 
 Chạy dev server:
@@ -149,6 +162,24 @@ Frontend vẫn chạy ở root project bằng:
 npm run dev
 ```
 
+## Frontend nối API public
+
+Frontend hiện gọi API public của backend qua biến môi trường:
+
+```txt
+VITE_API_BASE_URL=http://localhost:4000/api
+```
+
+Luồng dữ liệu chính:
+
+- `src/services/apiClient.js` cấu hình base URL và xử lý response JSON.
+- `src/services/movieApi.js` gom các hàm gọi `/movies`, `/categories`, `/search`.
+- `src/services/movieAdapter.js` chuyển response backend về format UI cũ đang dùng.
+- `src/data/movieRepository.js` ưu tiên đọc API, nếu backend tắt hoặc lỗi thì tự fallback về `src/data/movies.js`.
+- Watchlist và history vẫn lưu bằng `localStorage`, chưa chuyển sang backend.
+
+Khi muốn test đúng luồng API, chạy backend trước ở `http://localhost:4000`, sau đó chạy frontend ở `http://localhost:5173`.
+
 ## Tài liệu dự án
 
 - [Trạng thái dự án](docs/PROJECT_STATUS.md)
@@ -160,6 +191,7 @@ npm run dev
 - [Security plan](docs/SECURITY_PLAN.md)
 - [Task backend](docs/BACKEND_TASKS.md)
 - [Bước tiếp theo](docs/NEXT_STEPS.md)
+- [Nối frontend với API public](docs/FRONTEND_API_INTEGRATION.md)
 - [Backend skeleton](server/README.md)
 
 ## Deploy Vercel
@@ -194,6 +226,8 @@ Ghi chú:
 - Tìm kiếm overlay
 - URL routing bằng History API, không dùng hash route
 - SEO meta cơ bản: `document.title`, meta description và canonical theo route
+- Frontend gọi API public cho phim, thể loại, chi tiết phim, tập phim, search và tăng lượt xem
+- Fallback về dữ liệu mock nếu backend local không chạy
 - Lưu phim bằng `localStorage`
 - Lịch sử xem bằng `localStorage`
 - Responsive mobile/tablet/desktop
@@ -212,8 +246,9 @@ Ghi chú:
 
 ## Ghi chú phát triển
 
-- Dữ liệu mẫu hiện nằm trong `src/data/movies.js`.
+- Dữ liệu mẫu hiện nằm trong `src/data/movies.js` và vẫn được giữ làm fallback.
+- Frontend gọi API qua `src/services/` và `src/data/movieRepository.js`.
 - Luồng render chính bắt đầu từ `src/main.js`, qua `src/router/router.js`, đọc URL hiện tại rồi tới các file view trong `src/render/`.
 - Search, watchlist và history nằm trong `src/features/`.
 - Giao diện chính nằm trong `css/style.css`, dùng CSS variables và chia nhóm style theo base, header, hero, card phim, listing, detail, player, search, account và responsive.
-- Backend hiện có health check, Docker Compose PostgreSQL local, Prisma migration đầu tiên, seed dữ liệu mẫu và API public đầu tiên trong `server/`. Chưa có admin hoặc đăng nhập thật.
+- Backend hiện có health check, Docker Compose PostgreSQL local, Prisma migration đầu tiên, seed dữ liệu mẫu và API public đầu tiên trong `server/`. Frontend đã nối API public, nhưng chưa có admin hoặc đăng nhập thật.

@@ -1,4 +1,17 @@
-import { movies } from '../data/movies.js';
+import {
+  findCachedGenreBySlug,
+  findCachedMovieById,
+  getDataSource,
+  getLastDataError,
+  increaseMovieView,
+  loadCategories,
+  loadHomeMovies,
+  loadMovieBySlug,
+  loadMovieEpisodes,
+  loadMovies,
+  loadMoviesByCategory,
+  searchMovies
+} from '../data/movieRepository.js';
 import { addHistoryItem } from '../features/history.js';
 import { closeSearch } from '../features/search.js';
 import { renderAccount } from '../render/accountView.js';
@@ -15,9 +28,8 @@ import { updateSeoMeta } from '../utils/seo.js';
 import {
   detailUrl,
   episodeByRouteNumber,
-  findGenreBySlug,
-  findMovieBySlug,
   genreUrl,
+  movieSlug,
   watchUrl
 } from '../utils/slug.js';
 
@@ -33,7 +45,7 @@ const DEFAULT_FILTERS = {
 };
 
 function findMovieById(movieId) {
-  return movies.find(movie => movie.id === Number(movieId)) || null;
+  return findCachedMovieById(movieId);
 }
 
 function setFilters(patch = {}) {
@@ -79,32 +91,44 @@ function parseSegments(pathname) {
     });
 }
 
-function parseCurrentRoute() {
+async function parseCurrentRoute() {
   const state = getState();
   const url = new URL(window.location.href);
   const segments = parseSegments(url.pathname);
 
   state.searchKeyword = '';
+  state.routeMovies = [];
+  state.searchResults = [];
+  state.currentMovie = null;
+  state.currentEpisodes = [];
 
   if (segments.length === 0) {
     resetRouteState('home', 'home');
+    const data = await loadHomeMovies();
+    state.routeMovies = data.movies;
+    state.categories = data.categories;
     return;
   }
 
   if (segments.length === 1 && segments[0] === 'phim-le') {
     resetRouteState('listing', 'movie');
+    state.routeMovies = await loadMovies({ type: 'MOVIE' });
     setFilters({ type: 'Phim lẻ' });
     return;
   }
 
   if (segments.length === 1 && segments[0] === 'phim-bo') {
     resetRouteState('listing', 'series');
+    state.routeMovies = await loadMovies({ type: 'SERIES' });
     setFilters({ type: 'Phim bộ' });
     return;
   }
 
   if (segments.length === 1 && segments[0] === 'tai-khoan') {
     resetRouteState('account', 'account');
+    const data = await loadHomeMovies();
+    state.routeMovies = data.movies;
+    state.categories = data.categories;
     return;
   }
 
@@ -113,11 +137,13 @@ function parseCurrentRoute() {
     resetRouteState('search', 'search');
     state.searchKeyword = keyword;
     state.filters.keyword = keyword;
+    state.searchResults = keyword ? await searchMovies(keyword) : [];
     return;
   }
 
   if (segments.length === 2 && segments[0] === 'the-loai') {
-    const genre = findGenreBySlug(segments[1]);
+    await loadCategories();
+    const genre = findCachedGenreBySlug(segments[1]);
     if (!genre) {
       setNotFound('Thể loại phim này không tồn tại trong dữ liệu mẫu.');
       return;
@@ -125,11 +151,12 @@ function parseCurrentRoute() {
 
     resetRouteState('listing', 'explore');
     setFilters({ genre });
+    state.routeMovies = await loadMoviesByCategory(segments[1]);
     return;
   }
 
   if (segments.length === 2 && segments[0] === 'phim') {
-    const movie = findMovieBySlug(segments[1]);
+    const movie = await loadMovieBySlug(segments[1]);
     if (!movie) {
       setNotFound('Không tìm thấy phim theo đường dẫn này.');
       return;
@@ -137,12 +164,14 @@ function parseCurrentRoute() {
 
     resetRouteState('detail', activeRouteForMovie(movie));
     state.selectedMovieId = movie.id;
+    state.currentMovie = movie;
+    state.currentEpisodes = movie.episodes || [];
     state.season = movie.episodes?.[0]?.season || 1;
     return;
   }
 
   if (segments.length === 3 && segments[0] === 'xem') {
-    const movie = findMovieBySlug(segments[1]);
+    const movie = await loadMovieBySlug(segments[1]);
     const match = segments[2].match(/^tap-(\d+)$/);
 
     if (!movie) {
@@ -155,6 +184,8 @@ function parseCurrentRoute() {
       return;
     }
 
+    const episodes = await loadMovieEpisodes(segments[1], movie);
+    movie.episodes = episodes;
     const episode = episodeByRouteNumber(movie, Number(match[1]));
     if (episode === undefined) {
       setNotFound(`Tập ${match[1]} không tồn tại trong dữ liệu mẫu của phim này.`);
@@ -163,9 +194,12 @@ function parseCurrentRoute() {
 
     resetRouteState('player', activeRouteForMovie(movie));
     state.selectedMovieId = movie.id;
+    state.currentMovie = movie;
+    state.currentEpisodes = episodes;
     state.currentEpisodeId = episode?.id || null;
     state.season = episode?.season || 1;
     addHistoryItem(movie.id, state.currentEpisodeId);
+    increaseMovieView(movieSlug(movie));
     return;
   }
 
@@ -175,7 +209,7 @@ function parseCurrentRoute() {
 function updateMetaForCurrentRoute() {
   const state = getState();
   const canonicalPath = window.location.pathname || '/';
-  const movie = findMovieById(state.selectedMovieId);
+  const movie = state.currentMovie || findMovieById(state.selectedMovieId);
 
   if (state.page === 'home') {
     updateSeoMeta({
@@ -242,6 +276,17 @@ function updateMetaForCurrentRoute() {
   });
 }
 
+function syncDataStatus() {
+  const state = getState();
+  state.dataSource = getDataSource();
+  state.dataError = getLastDataError();
+}
+
+function renderLoading() {
+  app.innerHTML = `<div class="container" style="padding-top:120px"><div class="empty-state"><span><i data-lucide="loader"></i></span><strong>Đang tải dữ liệu phim...</strong></div></div>`;
+  createIcons();
+}
+
 export function render() {
   const state = getState();
 
@@ -256,11 +301,23 @@ export function render() {
   createIcons();
 }
 
-export function applyCurrentRoute(options = {}) {
+export async function applyCurrentRoute(options = {}) {
   const { scroll = false } = options;
   const state = getState();
 
-  parseCurrentRoute();
+  state.isLoading = true;
+  renderLoading();
+
+  try {
+    await parseCurrentRoute();
+  } catch (error) {
+    setNotFound('Không tải được dữ liệu cho đường dẫn này. Ứng dụng sẽ thử dùng dữ liệu mẫu nếu có.');
+    console.error(error);
+  } finally {
+    state.isLoading = false;
+    syncDataStatus();
+  }
+
   renderHeaderActive(state.activeRoute);
   render();
   updateMetaForCurrentRoute();

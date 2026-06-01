@@ -1,4 +1,4 @@
-import { movies } from '../data/movies.js';
+import { getCachedCategories, getCachedMovies } from '../data/movieRepository.js';
 import { getHistory } from '../features/history.js';
 import { escapeHTML, typeLabel } from '../utils/format.js';
 import { imageFallbackAttr } from '../utils/imageFallback.js';
@@ -6,7 +6,10 @@ import { detailUrl, genreUrl, watchUrl } from '../utils/slug.js';
 import { icon, movieById, renderEmptyState, renderMovieCard } from './layout.js';
 
 export function renderHome(app) {
+  const movies = getCachedMovies();
+  const categories = getCachedCategories();
   const hero = movies[0];
+  const heroId = JSON.stringify(hero.id);
   const continueItems = getHistory()
     .map(item => ({ ...item, movie: movieById(item.movieId) }))
     .filter(item => item.movie);
@@ -26,7 +29,7 @@ export function renderHome(app) {
           <div class="actions">
             <a class="btn btn-primary" href="${watchUrl(hero)}">${icon('play')} Xem ngay</a>
             <a class="btn btn-ghost" href="${detailUrl(hero)}">${icon('film')} Chi tiết</a>
-            <button class="btn btn-ghost" type="button" onclick="toggleSave(${hero.id}, event)">${icon('plus')} Danh sách</button>
+            <button class="btn btn-ghost" type="button" onclick="toggleSave(${heroId}, event)">${icon('plus')} Danh sách</button>
           </div>
         </div>
       </div>
@@ -53,7 +56,7 @@ export function renderHome(app) {
       </section>
       <section class="section">
         <div class="section-head"><h2 class="section-title">Khám phá theo thể loại</h2></div>
-        <div class="chips">${['Hành động','Tình cảm','Kinh dị','Hài','Khoa học viễn tưởng','Cổ trang','Trinh thám'].map(genre => `<a class="chip" href="${genreUrl(genre)}">${genre}</a>`).join('')}</div>
+        <div class="chips">${categories.slice(0, 8).map(category => `<a class="chip" href="${genreUrl(category.name)}">${category.name}</a>`).join('')}</div>
       </section>
     </div>`;
 }

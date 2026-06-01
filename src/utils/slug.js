@@ -43,7 +43,7 @@ export function episodeRouteNumber(movie, episodeId) {
   const episodes = movie?.episodes || [];
   if (!episodes.length) return 1;
 
-  const index = episodes.findIndex(ep => ep.id === episodeId);
+  const index = episodes.findIndex(ep => String(ep.id) === String(episodeId));
   return index >= 0 ? index + 1 : 1;
 }
 

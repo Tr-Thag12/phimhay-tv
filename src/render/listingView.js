@@ -1,4 +1,4 @@
-import { movies as allMovies } from '../data/movies.js';
+import { getCachedMovies } from '../data/movieRepository.js';
 import { getState } from '../state/store.js';
 import { qs, qsa, createIcons } from '../utils/dom.js';
 import { escapeHTML, typeLabel } from '../utils/format.js';
@@ -6,6 +6,7 @@ import { renderMovieCard } from './layout.js';
 
 function filteredMovies() {
   const state = getState();
+  const allMovies = state.routeMovies?.length ? state.routeMovies : getCachedMovies();
   const kw = state.filters.keyword.trim().toLowerCase();
   const movies = allMovies.filter(movie => {
     const matchKeyword = !kw || `${movie.title} ${movie.originalTitle} ${movie.genres.join(' ')} ${movie.country}`.toLowerCase().includes(kw);
