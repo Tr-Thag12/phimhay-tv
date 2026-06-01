@@ -86,6 +86,17 @@ export async function initAuth() {
       authMessage: null
     });
   } catch (error) {
+    if (error?.status === 0) {
+      return setAuthState({
+        user: null,
+        token,
+        isAuthenticated: false,
+        isAuthLoading: false,
+        authError: authErrorMessage(error),
+        authMessage: null
+      });
+    }
+
     setLoggedOut({
       authError: authErrorMessage(error),
       authMessage: null
