@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: phimhay_tv_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: phimhay
+      POSTGRES_PASSWORD: phimhay_password
+      POSTGRES_DB: phimhay_tv
+    ports:
+      - "5432:5432"
+    volumes:
+      - phimhay_tv_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U phimhay -d phimhay_tv"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  phimhay_tv_pgdata:
