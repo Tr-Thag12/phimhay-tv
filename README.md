@@ -1,6 +1,6 @@
 # PhimHay TV - Base Project
 
-Đây là base project front-end cho website xem phim PhimHay TV. Project đang chạy bằng Vite, HTML/CSS/JavaScript thuần và vẫn là frontend mock, chưa có backend/database.
+Đây là base project cho website xem phim PhimHay TV. Frontend đang chạy bằng Vite, HTML/CSS/JavaScript thuần. Backend hiện có skeleton Node.js + Express + Prisma trong thư mục `server/`, chưa có database thật và chưa nối frontend.
 
 Demo Vercel: https://phimhay-tv.vercel.app/
 
@@ -20,6 +20,19 @@ phimhay-tv-base/
 │  ├─ render/
 │  └─ features/
 ├─ assets/
+├─ server/
+│  ├─ package.json
+│  ├─ .env.example
+│  ├─ README.md
+│  ├─ prisma/
+│  │  └─ schema.prisma
+│  └─ src/
+│     ├─ app.js
+│     ├─ server.js
+│     ├─ config/
+│     ├─ routes/
+│     ├─ middlewares/
+│     └─ utils/
 ├─ BACKEND_PLAN.md
 ├─ TODO.md
 ├─ PROJECT_MAP.md
@@ -83,6 +96,30 @@ https://phimhay-tv.vercel.app/
 
 Đây là bản frontend mock để xem giao diện, routing URL, search, watchlist/history bằng `localStorage` và player giả lập. Project chưa có backend, database, admin hoặc đăng nhập thật.
 
+## Backend skeleton
+
+Backend skeleton nằm trong thư mục `server/` và chạy riêng với frontend.
+
+```bash
+cd server
+npm install
+npm run dev
+```
+
+Health check:
+
+```txt
+http://localhost:4000/api/health
+```
+
+Xem hướng dẫn chi tiết tại [server/README.md](server/README.md).
+
+Frontend vẫn chạy ở root project bằng:
+
+```bash
+npm run dev
+```
+
 ## Tài liệu dự án
 
 - [Trạng thái dự án](docs/PROJECT_STATUS.md)
@@ -94,6 +131,7 @@ https://phimhay-tv.vercel.app/
 - [Security plan](docs/SECURITY_PLAN.md)
 - [Task backend](docs/BACKEND_TASKS.md)
 - [Bước tiếp theo](docs/NEXT_STEPS.md)
+- [Backend skeleton](server/README.md)
 
 ## Deploy Vercel
 
@@ -149,4 +187,4 @@ Ghi chú:
 - Luồng render chính bắt đầu từ `src/main.js`, qua `src/router/router.js`, đọc URL hiện tại rồi tới các file view trong `src/render/`.
 - Search, watchlist và history nằm trong `src/features/`.
 - Giao diện chính nằm trong `css/style.css`, dùng CSS variables và chia nhóm style theo base, header, hero, card phim, listing, detail, player, search, account và responsive.
-- Chưa có backend, API thật, database, admin hoặc đăng nhập thật.
+- Backend hiện mới là skeleton trong `server/`, có health check và Prisma schema nháp. Chưa có API nghiệp vụ thật, database, admin hoặc đăng nhập thật.

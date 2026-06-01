@@ -1,0 +1,271 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum MovieType {
+  SINGLE
+  SERIES
+}
+
+enum MovieStatus {
+  DRAFT
+  PUBLISHED
+  HIDDEN
+}
+
+enum EpisodeStatus {
+  DRAFT
+  PUBLISHED
+  HIDDEN
+}
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  HIDDEN
+}
+
+enum ReportStatus {
+  OPEN
+  REVIEWING
+  RESOLVED
+  REJECTED
+}
+
+enum BannerPosition {
+  HOME_HERO
+  HOME_SECTION
+  PLAYER
+}
+
+model User {
+  id           String         @id @default(cuid())
+  email        String         @unique
+  passwordHash String?        @map("password_hash")
+  name         String
+  avatarUrl    String?        @map("avatar_url")
+  role         Role           @default(USER)
+  isActive     Boolean        @default(true) @map("is_active")
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+  watchlist    Watchlist[]
+  watchHistory WatchHistory[]
+  ratings      Rating[]
+  comments     Comment[]
+  reports      Report[]       @relation("ReportAuthor")
+
+  @@map("users")
+}
+
+model Movie {
+  id              String          @id @default(cuid())
+  title           String
+  slug            String          @unique
+  originalTitle   String?         @map("original_title")
+  description     String?         @db.Text
+  type            MovieType
+  status          MovieStatus     @default(DRAFT)
+  posterUrl       String?         @map("poster_url")
+  backdropUrl     String?         @map("backdrop_url")
+  trailerUrl      String?         @map("trailer_url")
+  releaseYear     Int?            @map("release_year")
+  durationMinutes Int?            @map("duration_minutes")
+  quality         String?
+  ageRating       String?         @map("age_rating")
+  ratingAverage   Float           @default(0) @map("rating_average")
+  viewCount       Int             @default(0) @map("view_count")
+  countryId       String?         @map("country_id")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  country         Country?        @relation(fields: [countryId], references: [id], onDelete: SetNull)
+  episodes        Episode[]
+  categories      MovieCategory[]
+  watchlist       Watchlist[]
+  watchHistory    WatchHistory[]
+  ratings         Rating[]
+  comments        Comment[]
+  reports         Report[]
+  banners         Banner[]
+
+  @@index([type, status])
+  @@index([countryId])
+  @@map("movies")
+}
+
+model Episode {
+  id              String         @id @default(cuid())
+  movieId         String         @map("movie_id")
+  title           String
+  slug            String
+  episodeNumber   Int            @map("episode_number")
+  videoUrl        String?        @map("video_url")
+  durationMinutes Int?           @map("duration_minutes")
+  status          EpisodeStatus  @default(DRAFT)
+  publishedAt     DateTime?      @map("published_at")
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+  movie           Movie          @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  watchHistory    WatchHistory[]
+  comments        Comment[]
+
+  @@unique([movieId, episodeNumber])
+  @@unique([movieId, slug])
+  @@index([movieId, status])
+  @@map("episodes")
+}
+
+model Category {
+  id          String          @id @default(cuid())
+  name        String
+  slug        String          @unique
+  description String?         @db.Text
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+  movies      MovieCategory[]
+
+  @@map("categories")
+}
+
+model MovieCategory {
+  movieId    String   @map("movie_id")
+  categoryId String   @map("category_id")
+  assignedAt DateTime @default(now()) @map("assigned_at")
+  movie      Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([movieId, categoryId])
+  @@map("movie_categories")
+}
+
+model Country {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  code      String?  @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  movies    Movie[]
+
+  @@map("countries")
+}
+
+model Watchlist {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  movieId   String   @map("movie_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie     Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, movieId])
+  @@index([movieId])
+  @@map("watchlist")
+}
+
+model WatchHistory {
+  id              String   @id @default(cuid())
+  userId          String   @map("user_id")
+  movieId         String   @map("movie_id")
+  episodeId       String?  @map("episode_id")
+  progressSeconds Int      @default(0) @map("progress_seconds")
+  durationSeconds Int?     @map("duration_seconds")
+  watchedAt       DateTime @default(now()) @map("watched_at")
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie           Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  episode         Episode? @relation(fields: [episodeId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, movieId, episodeId])
+  @@index([movieId])
+  @@index([watchedAt])
+  @@map("watch_history")
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  movieId   String   @map("movie_id")
+  score     Int
+  review    String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie     Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, movieId])
+  @@index([movieId])
+  @@map("ratings")
+}
+
+model Comment {
+  id        String        @id @default(cuid())
+  userId    String        @map("user_id")
+  movieId   String        @map("movie_id")
+  episodeId String?       @map("episode_id")
+  parentId  String?       @map("parent_id")
+  content   String        @db.Text
+  status    CommentStatus @default(PENDING)
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie     Movie         @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  episode   Episode?      @relation(fields: [episodeId], references: [id], onDelete: SetNull)
+  parent    Comment?      @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[]     @relation("CommentReplies")
+  reports   Report[]
+
+  @@index([movieId, status])
+  @@index([episodeId])
+  @@index([parentId])
+  @@map("comments")
+}
+
+model Report {
+  id         String       @id @default(cuid())
+  reporterId String?      @map("reporter_id")
+  movieId    String?      @map("movie_id")
+  commentId  String?      @map("comment_id")
+  type       String
+  reason     String       @db.Text
+  status     ReportStatus @default(OPEN)
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+  reporter   User?        @relation("ReportAuthor", fields: [reporterId], references: [id], onDelete: SetNull)
+  movie      Movie?       @relation(fields: [movieId], references: [id], onDelete: SetNull)
+  comment    Comment?     @relation(fields: [commentId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([movieId])
+  @@index([commentId])
+  @@map("reports")
+}
+
+model Banner {
+  id        String         @id @default(cuid())
+  movieId   String?        @map("movie_id")
+  title     String
+  subtitle  String?
+  imageUrl  String?        @map("image_url")
+  linkUrl   String?        @map("link_url")
+  position  BannerPosition @default(HOME_HERO)
+  sortOrder Int            @default(0) @map("sort_order")
+  isActive  Boolean        @default(true) @map("is_active")
+  startsAt  DateTime?      @map("starts_at")
+  endsAt    DateTime?      @map("ends_at")
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @updatedAt @map("updated_at")
+  movie     Movie?         @relation(fields: [movieId], references: [id], onDelete: SetNull)
+
+  @@index([position, isActive])
+  @@index([movieId])
+  @@map("banners")
+}
