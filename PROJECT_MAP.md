@@ -89,6 +89,7 @@ phimhay-tv-base/
 │  ├─ UI_REDESIGN_NOTES.md
 │  ├─ ROUTING_SEO_NOTES.md
 │  ├─ FRONTEND_API_INTEGRATION.md
+│  ├─ FULLSTACK_LOCAL_GUIDE.md
 │  └─ DEPLOYMENT_NOTES.md
 ├─ BACKEND_PLAN.md
 ├─ TODO.md
@@ -167,9 +168,39 @@ phimhay-tv-base/
 - `docs/UI_REDESIGN_NOTES.md`: Ghi chú tiếng Việt về hướng thiết kế giao diện V1 và những điểm cần cải thiện ở bước sau.
 - `docs/ROUTING_SEO_NOTES.md`: Ghi chú route, slug và SEO meta cơ bản.
 - `docs/FRONTEND_API_INTEGRATION.md`: Ghi chú cách frontend gọi API public, fallback về mock data và các route cần kiểm thử.
+- `docs/FULLSTACK_LOCAL_GUIDE.md`: Hướng dẫn chạy fullstack local bằng 3 terminal, test API/frontend/fallback, kiểm tra data source và xử lý lỗi thường gặp.
 - `docs/DEPLOYMENT_NOTES.md`: Ghi chú deploy Vercel, route cần kiểm tra và lý do chưa dùng GitHub Pages ở bước này.
 
 ## Luồng chạy hiện tại
+
+### Luồng frontend gọi API public
+
+```txt
+View trong src/render/
+→ src/router/router.js
+→ src/data/movieRepository.js
+→ src/services/movieApi.js
+→ src/services/apiClient.js
+→ Backend API /api
+→ server/src/controllers/
+→ server/src/services/
+→ Prisma Client
+→ PostgreSQL local
+```
+
+`movieRepository.js` là lớp quyết định nguồn dữ liệu cho frontend. Khi API thành công, runtime state có `dataSource` là `api`.
+
+### Luồng fallback mock
+
+```txt
+API lỗi hoặc backend tắt
+→ movieRepository bắt lỗi
+→ fallback về src/data/movies.js
+→ cache/state frontend cập nhật
+→ view vẫn render bằng dữ liệu mock
+```
+
+Khi fallback xảy ra, runtime state có `dataSource` là `mock`; lỗi gần nhất nằm ở `window.state.dataError`. Warning mạng như `ERR_CONNECTION_REFUSED` hoặc `Failed to fetch` là bình thường khi cố tình tắt backend để test fallback.
 
 1. Trình duyệt tải `index.html`.
 2. `index.html` tải `css/style.css` và script module `/src/main.js`.

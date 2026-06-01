@@ -4,7 +4,7 @@
 
 Demo Vercel: https://phimhay-tv.vercel.app/
 
-Branch nối frontend API của bước này: `feature/connect-frontend-api`.
+Demo Vercel hiện là frontend đã deploy. Backend production chưa deploy, nên khi không có backend online, frontend vẫn cần fallback mock data để demo không bị hỏng.
 
 ```txt
 phimhay-tv-base/
@@ -56,13 +56,56 @@ phimhay-tv-base/
 │  ├─ NEXT_STEPS.md
 │  ├─ UI_REDESIGN_NOTES.md
 │  ├─ ROUTING_SEO_NOTES.md
+│  ├─ FRONTEND_API_INTEGRATION.md
+│  ├─ FULLSTACK_LOCAL_GUIDE.md
 │  └─ DEPLOYMENT_NOTES.md
 ├─ package.json
 ├─ vercel.json
 └─ vite.config.mjs
 ```
 
-## Cách chạy
+## Chạy fullstack local
+
+Xem hướng dẫn chi tiết tại [docs/FULLSTACK_LOCAL_GUIDE.md](docs/FULLSTACK_LOCAL_GUIDE.md).
+
+Khi chạy đủ fullstack local, dùng 3 terminal:
+
+1. Database:
+
+```bash
+cd server
+npm run db:up
+docker compose ps
+```
+
+2. Backend:
+
+```bash
+cd server
+npm install
+npx prisma migrate reset --force
+npm run prisma:generate
+npm run db:seed
+npm run start
+```
+
+3. Frontend:
+
+```bash
+npm install
+npm run dev
+```
+
+URL chính:
+
+```txt
+Frontend: http://localhost:5173
+Backend health: http://localhost:4000/api/health
+```
+
+Lưu ý: `npx prisma migrate reset --force` chỉ nên dùng ở local vì sẽ xóa dữ liệu trong database dev rồi seed lại dữ liệu mẫu. Demo Vercel hiện chỉ là frontend; backend production chưa deploy.
+
+## Chạy frontend riêng
 
 Cài dependency:
 
@@ -114,7 +157,7 @@ Bản demo online đang chạy tại:
 https://phimhay-tv.vercel.app/
 ```
 
-Đây là bản frontend mock để xem giao diện, routing URL, search, watchlist/history bằng `localStorage` và player giả lập. Project chưa có backend, database, admin hoặc đăng nhập thật.
+Đây là bản frontend đã deploy để xem giao diện, routing URL, search, watchlist/history bằng `localStorage` và player giả lập. Backend production chưa deploy, nên demo online vẫn dùng mock/fallback khi không có API public online.
 
 ## Backend skeleton
 
@@ -192,6 +235,7 @@ Khi muốn test đúng luồng API, chạy backend trước ở `http://localhos
 - [Task backend](docs/BACKEND_TASKS.md)
 - [Bước tiếp theo](docs/NEXT_STEPS.md)
 - [Nối frontend với API public](docs/FRONTEND_API_INTEGRATION.md)
+- [Chạy fullstack local](docs/FULLSTACK_LOCAL_GUIDE.md)
 - [Backend skeleton](server/README.md)
 
 ## Deploy Vercel
