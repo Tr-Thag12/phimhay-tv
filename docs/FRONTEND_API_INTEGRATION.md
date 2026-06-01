@@ -76,6 +76,54 @@ Khi backend đã dừng:
 
 Các route trên vẫn phải render được bằng dữ liệu mock.
 
+## Cách kiểm tra API/mock
+
+Frontend lưu nguồn dữ liệu hiện tại trong runtime state:
+
+```js
+window.state.dataSource
+```
+
+Giá trị mong đợi:
+
+- `api`: backend local đang chạy, API trả response hợp lệ và frontend đang ưu tiên dữ liệu thật từ PostgreSQL.
+- `mock`: backend tắt, lỗi mạng hoặc API trả lỗi; frontend đã fallback về `src/data/movies.js`.
+
+Lỗi API gần nhất, nếu có, nằm ở:
+
+```js
+window.state.dataError
+```
+
+## Khi nào fallback xảy ra
+
+Fallback xảy ra khi `src/data/movieRepository.js` không lấy được dữ liệu từ API public, ví dụ:
+
+- Backend ở `http://localhost:4000` chưa chạy.
+- Port 4000 bị chiếm bởi process khác.
+- Database/PostgreSQL chưa sẵn sàng nên API lỗi.
+- API trả response lỗi hoặc response không đúng format mong đợi.
+- Mạng local từ browser tới backend bị từ chối.
+
+Khi fallback xảy ra, browser có thể hiện warning như `ERR_CONNECTION_REFUSED` hoặc `Failed to fetch`. Đây là warning được phép trong lúc test fallback, miễn là app vẫn render và không crash.
+
+## Cách test khi backend tắt
+
+1. Chạy frontend bằng `npm run dev`.
+2. Dừng backend bằng `Ctrl+C` ở terminal backend.
+3. Reload các route:
+   - `/`
+   - `/phim-le`
+   - `/phim/bong-dem-sai-gon`
+   - `/tim-kiem?q=hanh%20dong`
+4. Mở DevTools Console và kiểm tra:
+
+```js
+window.state.dataSource
+```
+
+Kết quả mong đợi là `mock`. Các trang vẫn phải render bằng dữ liệu mẫu trong `src/data/movies.js`.
+
 ## Ghi chú
 
 - Frontend chưa lưu watchlist/history lên backend.
