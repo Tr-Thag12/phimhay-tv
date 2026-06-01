@@ -8,6 +8,7 @@ import {
   ReportStatus,
   Role,
 } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -215,10 +216,13 @@ async function seedCategories() {
 }
 
 async function seedUsers() {
+  const adminPasswordHash = await bcrypt.hash("Admin@123456", 12);
+  const userPasswordHash = await bcrypt.hash("User@123456", 12);
+
   const admin = await prisma.user.create({
     data: {
       email: "admin@phimhay.local",
-      passwordHash: "not_configured_yet",
+      passwordHash: adminPasswordHash,
       name: "Quản trị viên",
       role: Role.ADMIN,
       isActive: true,
@@ -228,7 +232,7 @@ async function seedUsers() {
   const user = await prisma.user.create({
     data: {
       email: "user@phimhay.local",
-      passwordHash: "not_configured_yet",
+      passwordHash: userPasswordHash,
       name: "Người dùng mẫu",
       role: Role.USER,
       isActive: true,
@@ -399,7 +403,7 @@ async function seedUserActivity(user, movies) {
 
 async function main() {
   console.log("Bắt đầu seed dữ liệu mẫu PhimHay TV...");
-  console.log("Auth chưa được triển khai, password_hash đang dùng placeholder not_configured_yet.");
+  console.log("Seed user mẫu dev với password_hash bcryptjs thật.");
 
   await clearData();
   await seedCountries();

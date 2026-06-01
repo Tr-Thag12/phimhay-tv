@@ -59,20 +59,27 @@ phimhay-tv-base/
 │     │  └─ prisma.js
 │     ├─ services/
 │     │  ├─ movie.service.js
-│     │  └─ category.service.js
+│     │  ├─ category.service.js
+│     │  └─ auth.service.js
 │     ├─ controllers/
 │     │  ├─ movie.controller.js
 │     │  ├─ category.controller.js
-│     │  └─ search.controller.js
+│     │  ├─ search.controller.js
+│     │  └─ auth.controller.js
 │     ├─ routes/
 │     │  ├─ index.js
 │     │  ├─ health.routes.js
 │     │  ├─ movie.routes.js
 │     │  ├─ category.routes.js
-│     │  └─ search.routes.js
+│     │  ├─ search.routes.js
+│     │  └─ auth.routes.js
 │     ├─ middlewares/
 │     │  ├─ notFound.js
-│     │  └─ errorHandler.js
+│     │  ├─ errorHandler.js
+│     │  ├─ authMiddleware.js
+│     │  └─ requireAdmin.js
+│     ├─ validators/
+│     │  └─ auth.validator.js
 │     └─ utils/
 │        ├─ response.js
 │        └─ pagination.js
@@ -90,7 +97,8 @@ phimhay-tv-base/
 │  ├─ ROUTING_SEO_NOTES.md
 │  ├─ FRONTEND_API_INTEGRATION.md
 │  ├─ FULLSTACK_LOCAL_GUIDE.md
-│  └─ DEPLOYMENT_NOTES.md
+│  ├─ DEPLOYMENT_NOTES.md
+│  └─ AUTH_BACKEND_NOTES.md
 ├─ BACKEND_PLAN.md
 ├─ TODO.md
 ├─ README.md
@@ -105,10 +113,10 @@ phimhay-tv-base/
 - `index.html`: Khung HTML chính, giữ header, footer, search overlay, vùng `<main id="app"></main>`, CSS hiện tại và script module `/src/main.js`.
 - `.env.example`: Biến môi trường mẫu cho frontend, hiện có `VITE_API_BASE_URL=http://localhost:4000/api`.
 - `vercel.json`: Cấu hình Vercel cho SPA, rewrite mọi route về `/index.html` để reload URL con không bị 404. Demo production hiện ở `https://phimhay-tv.vercel.app/`.
-- `server/`: Backend Node.js + Express + Prisma, chạy riêng với frontend. Hiện có health check, API public đầu tiên, middleware lỗi cơ bản, PostgreSQL local bằng Docker Compose, Prisma migration đầu tiên, seed dữ liệu mẫu và tài liệu chạy backend.
+- `server/`: Backend Node.js + Express + Prisma, chạy riêng với frontend. Hiện có health check, API public, Auth API cơ bản bằng JWT, middleware lỗi cơ bản, PostgreSQL local bằng Docker Compose, Prisma migration đầu tiên, seed dữ liệu mẫu và tài liệu chạy backend.
 - `server/package.json`: Package backend riêng, có script `dev`, `start`, `db:up`, `db:down`, `db:logs`, `db:migrate`, `db:seed`, `db:studio`, `prisma:generate` và `prisma:studio`.
 - `server/docker-compose.yml`: Cấu hình PostgreSQL 16 local cho môi trường dev, dùng database `phimhay_tv` và volume `phimhay_tv_pgdata`.
-- `server/.env.example`: Biến môi trường mẫu cho backend, gồm `PORT`, `NODE_ENV`, `DATABASE_URL` và `CLIENT_URL`.
+- `server/.env.example`: Biến môi trường mẫu cho backend, gồm `PORT`, `NODE_ENV`, `DATABASE_URL`, `CLIENT_URL`, `JWT_SECRET` và `JWT_EXPIRES_IN`.
 - `server/prisma/schema.prisma`: Prisma schema cho các model chính như User, Movie, Episode, Category, Watchlist, WatchHistory, Rating, Comment, Report và Banner.
 - `server/prisma/migrations/`: Migration Prisma đầu tiên tạo database schema local.
 - `server/prisma/seed.js`: Seed dữ liệu mẫu cho countries, categories, users, movies, episodes, banners, watchlist, history, rating, comment và report.
@@ -118,16 +126,22 @@ phimhay-tv-base/
 - `server/src/lib/prisma.js`: Tạo Prisma Client dùng chung cho backend, tránh tạo nhiều instance rời rạc.
 - `server/src/services/movie.service.js`: Logic đọc danh sách phim, chi tiết phim, tập phim và tăng lượt xem từ PostgreSQL qua Prisma.
 - `server/src/services/category.service.js`: Logic đọc danh sách thể loại và phim theo thể loại.
+- `server/src/services/auth.service.js`: Logic đăng ký, đăng nhập, tạo JWT, lấy user hiện tại và chuyển user sang response an toàn không lộ password hash.
 - `server/src/controllers/movie.controller.js`: Controller public cho danh sách phim, chi tiết phim, tập phim và tăng lượt xem.
 - `server/src/controllers/category.controller.js`: Controller public cho danh sách thể loại và phim theo thể loại.
 - `server/src/controllers/search.controller.js`: Controller public cho `GET /api/search?q=keyword`.
-- `server/src/routes/index.js`: Gom các route backend chính và mount `/health`, `/movies`, `/categories`, `/search`.
+- `server/src/controllers/auth.controller.js`: Controller auth cho register, login, me và logout.
+- `server/src/routes/index.js`: Gom các route backend chính và mount `/health`, `/auth`, `/movies`, `/categories`, `/search`.
 - `server/src/routes/health.routes.js`: Endpoint `GET /api/health` trả JSON xác nhận backend đang hoạt động.
 - `server/src/routes/movie.routes.js`: Route public cho movies.
 - `server/src/routes/category.routes.js`: Route public cho categories.
 - `server/src/routes/search.routes.js`: Route public cho search.
+- `server/src/routes/auth.routes.js`: Route auth cho `/api/auth/register`, `/api/auth/login`, `/api/auth/me`, `/api/auth/logout` và rate limit nhẹ cho register/login.
 - `server/src/middlewares/notFound.js`: Trả JSON 404 cho route backend không tồn tại.
 - `server/src/middlewares/errorHandler.js`: Middleware xử lý lỗi chung, không lộ stack trace khi chạy production.
+- `server/src/middlewares/authMiddleware.js`: Middleware đọc JWT Bearer token, verify token, lấy user từ database và gắn user an toàn vào `req.user`.
+- `server/src/middlewares/requireAdmin.js`: Middleware kiểm tra `req.user.role === "ADMIN"` để chuẩn bị cho admin sau này.
+- `server/src/validators/auth.validator.js`: Validator `zod` cho register/login và helper format lỗi validation.
 - `server/src/utils/response.js`: Helper format JSON response thành công và lỗi.
 - `server/src/utils/pagination.js`: Helper parse `page`, `limit` và tạo metadata phân trang cho API.
 - `css/style.css`: Toàn bộ giao diện hiện tại theo phong cách dark cinematic V1, dùng CSS variables và các nhóm style rõ ràng cho base, header, hero, movie card, listing, detail, player, search, account và responsive.
@@ -170,6 +184,7 @@ phimhay-tv-base/
 - `docs/FRONTEND_API_INTEGRATION.md`: Ghi chú cách frontend gọi API public, fallback về mock data và các route cần kiểm thử.
 - `docs/FULLSTACK_LOCAL_GUIDE.md`: Hướng dẫn chạy fullstack local bằng 3 terminal, test API/frontend/fallback, kiểm tra data source và xử lý lỗi thường gặp.
 - `docs/DEPLOYMENT_NOTES.md`: Ghi chú deploy Vercel, route cần kiểm tra và lý do chưa dùng GitHub Pages ở bước này.
+- `docs/AUTH_BACKEND_NOTES.md`: Ghi chú Auth backend hiện tại, JWT Bearer token, giới hạn hiện có và user mẫu local dev.
 
 ## Luồng chạy hiện tại
 
@@ -214,8 +229,9 @@ Khi fallback xảy ra, runtime state có `dataSource` là `mock`; lỗi gần nh
 10. Khi deploy Vercel, `vercel.json` rewrite mọi request về `index.html`; app tự parse URL và render route đúng. Link demo hiện tại là `https://phimhay-tv.vercel.app/`.
 11. Backend chạy riêng trong `server/`; khi chạy `npm run start` trong thư mục này, Express mount route `GET /api/health` tại `http://localhost:4000/api/health`.
 12. Database dev chạy bằng `server/docker-compose.yml`; sau khi `npm run db:up`, Prisma dùng `DATABASE_URL` trong `server/.env` để migrate và seed dữ liệu mẫu.
-13. API public đầu tiên đọc dữ liệu từ PostgreSQL qua `server/src/lib/prisma.js`, đi qua routes trong `server/src/routes/`, controllers trong `server/src/controllers/` và services trong `server/src/services/`.
-14. Nếu backend local không chạy hoặc API trả lỗi, `movieRepository.js` tự dùng lại dữ liệu mock trong `src/data/movies.js` để giao diện vẫn hoạt động.
+13. API public đọc dữ liệu từ PostgreSQL qua `server/src/lib/prisma.js`, đi qua routes trong `server/src/routes/`, controllers trong `server/src/controllers/` và services trong `server/src/services/`.
+14. Auth API dùng `/api/auth/register`, `/api/auth/login`, `/api/auth/me`, `/api/auth/logout`; JWT được verify trong `authMiddleware.js` trước khi trả user hiện tại hoặc logout.
+15. Nếu backend local không chạy hoặc API trả lỗi, `movieRepository.js` tự dùng lại dữ liệu mock trong `src/data/movies.js` để giao diện vẫn hoạt động.
 
 ## Route URL hiện có
 
@@ -234,7 +250,10 @@ Khi fallback xảy ra, runtime state có `dataSource` là `mock`; lỗi gần nh
 - Đây vẫn là frontend Vite, HTML/CSS/JavaScript thuần; backend chạy riêng trong `server/`.
 - Đã có PostgreSQL local, migration đầu tiên và seed dữ liệu mẫu cho backend dev.
 - Đã có API public đầu tiên cho phim, thể loại và tìm kiếm.
+- Đã có Auth API cơ bản cho register, login, me, logout bằng JWT.
+- Đã có middleware xác thực JWT và middleware kiểm tra quyền admin.
 - Frontend đã nối API public cho danh sách phim, chi tiết phim, tập phim, search và tăng lượt xem; vẫn có fallback mock khi backend không khả dụng.
-- Chưa có admin hoặc đăng nhập thật.
+- Chưa nối frontend đăng nhập/đăng ký với Auth API.
+- Chưa có admin CRUD.
 - Không đổi cấu trúc dữ liệu phim mẫu. Dữ liệu hiện được dùng chính qua export module, còn `window.MOVIES`/`window.USER` chỉ được expose tạm trong `src/main.js` để tương thích khi cần kiểm tra nhanh.
 - Chưa nên sửa lớn cấu trúc `src/data/movies.js`, watchlist/history trong `localStorage`, hoặc cách render view hiện tại nếu chưa sang bước auth/admin.

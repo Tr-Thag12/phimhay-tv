@@ -1,6 +1,6 @@
 # PhimHay TV - Base Project
 
-Đây là base project cho website xem phim PhimHay TV. Frontend đang chạy bằng Vite, HTML/CSS/JavaScript thuần. Backend hiện có Node.js + Express + Prisma trong thư mục `server/`, kèm PostgreSQL local bằng Docker Compose, migration đầu tiên, seed dữ liệu mẫu và API public đầu tiên cho phim/thể loại/tìm kiếm. Frontend hiện đã gọi API public trước và tự fallback về dữ liệu mock khi backend không khả dụng.
+Đây là base project cho website xem phim PhimHay TV. Frontend đang chạy bằng Vite, HTML/CSS/JavaScript thuần. Backend hiện có Node.js + Express + Prisma trong thư mục `server/`, kèm PostgreSQL local bằng Docker Compose, migration đầu tiên, seed dữ liệu mẫu, API public cho phim/thể loại/tìm kiếm và Auth API cơ bản bằng JWT. Frontend hiện đã gọi API public trước và tự fallback về dữ liệu mock khi backend không khả dụng.
 
 Demo Vercel: https://phimhay-tv.vercel.app/
 
@@ -187,6 +187,17 @@ GET /api/categories/:slug/movies
 GET /api/search?q=keyword
 ```
 
+Auth API backend hiện có:
+
+```txt
+POST /api/auth/register
+POST /api/auth/login
+GET /api/auth/me
+POST /api/auth/logout
+```
+
+Auth dùng JWT Bearer token. Giao diện đăng nhập/đăng ký frontend chưa nối ở bước này.
+
 Database local bằng Docker Compose:
 
 ```bash
@@ -236,6 +247,7 @@ Khi muốn test đúng luồng API, chạy backend trước ở `http://localhos
 - [Bước tiếp theo](docs/NEXT_STEPS.md)
 - [Nối frontend với API public](docs/FRONTEND_API_INTEGRATION.md)
 - [Chạy fullstack local](docs/FULLSTACK_LOCAL_GUIDE.md)
+- [Ghi chú Auth backend](docs/AUTH_BACKEND_NOTES.md)
 - [Backend skeleton](server/README.md)
 
 ## Deploy Vercel
@@ -295,4 +307,4 @@ Ghi chú:
 - Luồng render chính bắt đầu từ `src/main.js`, qua `src/router/router.js`, đọc URL hiện tại rồi tới các file view trong `src/render/`.
 - Search, watchlist và history nằm trong `src/features/`.
 - Giao diện chính nằm trong `css/style.css`, dùng CSS variables và chia nhóm style theo base, header, hero, card phim, listing, detail, player, search, account và responsive.
-- Backend hiện có health check, Docker Compose PostgreSQL local, Prisma migration đầu tiên, seed dữ liệu mẫu và API public đầu tiên trong `server/`. Frontend đã nối API public, nhưng chưa có admin hoặc đăng nhập thật.
+- Backend hiện có health check, Docker Compose PostgreSQL local, Prisma migration đầu tiên, seed dữ liệu mẫu, API public và Auth API cơ bản trong `server/`. Frontend đã nối API public, nhưng chưa nối giao diện đăng nhập/đăng ký và chưa có admin CRUD.
