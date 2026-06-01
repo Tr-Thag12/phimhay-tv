@@ -51,14 +51,27 @@ phimhay-tv-base/
 │     ├─ server.js
 │     ├─ config/
 │     │  └─ env.js
+│     ├─ lib/
+│     │  └─ prisma.js
+│     ├─ services/
+│     │  ├─ movie.service.js
+│     │  └─ category.service.js
+│     ├─ controllers/
+│     │  ├─ movie.controller.js
+│     │  ├─ category.controller.js
+│     │  └─ search.controller.js
 │     ├─ routes/
 │     │  ├─ index.js
-│     │  └─ health.routes.js
+│     │  ├─ health.routes.js
+│     │  ├─ movie.routes.js
+│     │  ├─ category.routes.js
+│     │  └─ search.routes.js
 │     ├─ middlewares/
 │     │  ├─ notFound.js
 │     │  └─ errorHandler.js
 │     └─ utils/
-│        └─ response.js
+│        ├─ response.js
+│        └─ pagination.js
 ├─ docs/
 │  ├─ PROJECT_STATUS.md
 │  ├─ USER_FLOWS.md
@@ -84,7 +97,7 @@ phimhay-tv-base/
 
 - `index.html`: Khung HTML chính, giữ header, footer, search overlay, vùng `<main id="app"></main>`, CSS hiện tại và script module `/src/main.js`.
 - `vercel.json`: Cấu hình Vercel cho SPA, rewrite mọi route về `/index.html` để reload URL con không bị 404. Demo production hiện ở `https://phimhay-tv.vercel.app/`.
-- `server/`: Backend Node.js + Express + Prisma, chạy riêng với frontend. Hiện có health check, middleware lỗi cơ bản, PostgreSQL local bằng Docker Compose, Prisma migration đầu tiên, seed dữ liệu mẫu và tài liệu chạy backend.
+- `server/`: Backend Node.js + Express + Prisma, chạy riêng với frontend. Hiện có health check, API public đầu tiên, middleware lỗi cơ bản, PostgreSQL local bằng Docker Compose, Prisma migration đầu tiên, seed dữ liệu mẫu và tài liệu chạy backend.
 - `server/package.json`: Package backend riêng, có script `dev`, `start`, `db:up`, `db:down`, `db:logs`, `db:migrate`, `db:seed`, `db:studio`, `prisma:generate` và `prisma:studio`.
 - `server/docker-compose.yml`: Cấu hình PostgreSQL 16 local cho môi trường dev, dùng database `phimhay_tv` và volume `phimhay_tv_pgdata`.
 - `server/.env.example`: Biến môi trường mẫu cho backend, gồm `PORT`, `NODE_ENV`, `DATABASE_URL` và `CLIENT_URL`.
@@ -94,11 +107,21 @@ phimhay-tv-base/
 - `server/src/app.js`: Tạo Express app, cấu hình `helmet`, `cors`, `morgan`, `express.json()`, mount route `/api` và middleware lỗi.
 - `server/src/server.js`: Khởi động backend ở port cấu hình, mặc định `4000`, và log URL health check.
 - `server/src/config/env.js`: Đọc biến môi trường bằng `dotenv`, export config và cảnh báo nếu thiếu `DATABASE_URL`.
-- `server/src/routes/index.js`: Gom các route backend chính.
+- `server/src/lib/prisma.js`: Tạo Prisma Client dùng chung cho backend, tránh tạo nhiều instance rời rạc.
+- `server/src/services/movie.service.js`: Logic đọc danh sách phim, chi tiết phim, tập phim và tăng lượt xem từ PostgreSQL qua Prisma.
+- `server/src/services/category.service.js`: Logic đọc danh sách thể loại và phim theo thể loại.
+- `server/src/controllers/movie.controller.js`: Controller public cho danh sách phim, chi tiết phim, tập phim và tăng lượt xem.
+- `server/src/controllers/category.controller.js`: Controller public cho danh sách thể loại và phim theo thể loại.
+- `server/src/controllers/search.controller.js`: Controller public cho `GET /api/search?q=keyword`.
+- `server/src/routes/index.js`: Gom các route backend chính và mount `/health`, `/movies`, `/categories`, `/search`.
 - `server/src/routes/health.routes.js`: Endpoint `GET /api/health` trả JSON xác nhận backend đang hoạt động.
+- `server/src/routes/movie.routes.js`: Route public cho movies.
+- `server/src/routes/category.routes.js`: Route public cho categories.
+- `server/src/routes/search.routes.js`: Route public cho search.
 - `server/src/middlewares/notFound.js`: Trả JSON 404 cho route backend không tồn tại.
 - `server/src/middlewares/errorHandler.js`: Middleware xử lý lỗi chung, không lộ stack trace khi chạy production.
 - `server/src/utils/response.js`: Helper format JSON response thành công và lỗi.
+- `server/src/utils/pagination.js`: Helper parse `page`, `limit` và tạo metadata phân trang cho API.
 - `css/style.css`: Toàn bộ giao diện hiện tại theo phong cách dark cinematic V1, dùng CSS variables và các nhóm style rõ ràng cho base, header, hero, movie card, listing, detail, player, search, account và responsive.
 - `src/main.js`: Điểm khởi động app, import data/router/features, expose tạm các handler cần cho inline `onclick`, khởi tạo event và render ban đầu.
 - `src/data/movies.js`: Dữ liệu mẫu phim và user mock, export qua `movies` và `user`.
@@ -148,6 +171,7 @@ phimhay-tv-base/
 10. Khi deploy Vercel, `vercel.json` rewrite mọi request về `index.html`; app tự parse URL và render route đúng. Link demo hiện tại là `https://phimhay-tv.vercel.app/`.
 11. Backend chạy riêng trong `server/`; khi chạy `npm run start` trong thư mục này, Express mount route `GET /api/health` tại `http://localhost:4000/api/health`.
 12. Database dev chạy bằng `server/docker-compose.yml`; sau khi `npm run db:up`, Prisma dùng `DATABASE_URL` trong `server/.env` để migrate và seed dữ liệu mẫu.
+13. API public đầu tiên đọc dữ liệu từ PostgreSQL qua `server/src/lib/prisma.js`, đi qua routes trong `server/src/routes/`, controllers trong `server/src/controllers/` và services trong `server/src/services/`.
 
 ## Route URL hiện có
 
@@ -165,6 +189,7 @@ phimhay-tv-base/
 
 - Đây vẫn là frontend mock chạy bằng Vite, HTML/CSS/JavaScript thuần; backend chạy riêng trong `server/`.
 - Đã có PostgreSQL local, migration đầu tiên và seed dữ liệu mẫu cho backend dev.
-- Chưa có API nghiệp vụ thật, admin hoặc đăng nhập thật.
+- Đã có API public đầu tiên cho phim, thể loại và tìm kiếm.
+- Chưa có admin hoặc đăng nhập thật.
 - Không đổi cấu trúc dữ liệu phim mẫu. Dữ liệu hiện được dùng chính qua export module, còn `window.MOVIES`/`window.USER` chỉ được expose tạm trong `src/main.js` để tương thích khi cần kiểm tra nhanh.
 - Chưa nên sửa lớn cấu trúc `src/data/movies.js`, watchlist/history trong `localStorage`, hoặc cách render view hiện tại nếu chưa sang bước backend/API.

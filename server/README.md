@@ -142,6 +142,35 @@ Response thành công có dạng:
 }
 ```
 
+## API public đầu tiên
+
+Backend hiện có các API public để đọc dữ liệu phim, thể loại và tìm kiếm từ PostgreSQL thông qua Prisma:
+
+- `GET /api/movies`: Lấy danh sách phim đã publish, có phân trang và bộ lọc.
+- `GET /api/movies/:slug`: Lấy chi tiết phim theo slug.
+- `GET /api/movies/:slug/episodes`: Lấy danh sách tập phim đã publish.
+- `POST /api/movies/:slug/view`: Tăng lượt xem cho phim.
+- `GET /api/categories`: Lấy danh sách thể loại.
+- `GET /api/categories/:slug/movies`: Lấy phim theo thể loại.
+- `GET /api/search?q=keyword`: Tìm kiếm phim đã publish.
+
+Các API này chưa yêu cầu auth và chưa nối với frontend.
+
+## Lệnh test curl
+
+```bash
+curl http://localhost:4000/api/health
+curl http://localhost:4000/api/movies
+curl "http://localhost:4000/api/movies?page=1&limit=2"
+curl http://localhost:4000/api/movies/bong-dem-sai-gon
+curl http://localhost:4000/api/movies/bong-dem-sai-gon/episodes
+curl -X POST http://localhost:4000/api/movies/bong-dem-sai-gon/view
+curl http://localhost:4000/api/categories
+curl http://localhost:4000/api/categories/hanh-dong/movies
+curl "http://localhost:4000/api/search?q=hanh%20dong"
+curl http://localhost:4000/api/movies/khong-ton-tai
+```
+
 ## Dữ liệu seed
 
 Seed hiện tạo dữ liệu mẫu cho:
@@ -163,7 +192,7 @@ Auth chưa được triển khai, nên `password_hash` đang dùng placeholder `
 - Đã có PostgreSQL local bằng Docker Compose.
 - Đã có Prisma migration đầu tiên.
 - Đã có seed dữ liệu mẫu.
-- Chưa làm API movies thật.
+- Đã có API public đầu tiên cho movies, categories và search.
 - Chưa nối frontend với backend.
 - Chưa có auth thật.
 - Chưa có admin.

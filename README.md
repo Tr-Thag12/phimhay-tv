@@ -1,6 +1,6 @@
 # PhimHay TV - Base Project
 
-Đây là base project cho website xem phim PhimHay TV. Frontend đang chạy bằng Vite, HTML/CSS/JavaScript thuần. Backend hiện có Node.js + Express + Prisma trong thư mục `server/`, kèm PostgreSQL local bằng Docker Compose, migration đầu tiên và seed dữ liệu mẫu. Frontend chưa nối với backend.
+Đây là base project cho website xem phim PhimHay TV. Frontend đang chạy bằng Vite, HTML/CSS/JavaScript thuần. Backend hiện có Node.js + Express + Prisma trong thư mục `server/`, kèm PostgreSQL local bằng Docker Compose, migration đầu tiên, seed dữ liệu mẫu và API public đầu tiên cho phim/thể loại/tìm kiếm. Frontend chưa nối với backend.
 
 Demo Vercel: https://phimhay-tv.vercel.app/
 
@@ -34,6 +34,9 @@ phimhay-tv-base/
 │     ├─ app.js
 │     ├─ server.js
 │     ├─ config/
+│     ├─ lib/
+│     ├─ services/
+│     ├─ controllers/
 │     ├─ routes/
 │     ├─ middlewares/
 │     └─ utils/
@@ -114,6 +117,18 @@ Health check:
 
 ```txt
 http://localhost:4000/api/health
+```
+
+API public backend hiện có:
+
+```txt
+GET /api/movies
+GET /api/movies/:slug
+GET /api/movies/:slug/episodes
+POST /api/movies/:slug/view
+GET /api/categories
+GET /api/categories/:slug/movies
+GET /api/search?q=keyword
 ```
 
 Database local bằng Docker Compose:
@@ -201,4 +216,4 @@ Ghi chú:
 - Luồng render chính bắt đầu từ `src/main.js`, qua `src/router/router.js`, đọc URL hiện tại rồi tới các file view trong `src/render/`.
 - Search, watchlist và history nằm trong `src/features/`.
 - Giao diện chính nằm trong `css/style.css`, dùng CSS variables và chia nhóm style theo base, header, hero, card phim, listing, detail, player, search, account và responsive.
-- Backend hiện có health check, Docker Compose PostgreSQL local, Prisma migration đầu tiên và seed dữ liệu mẫu trong `server/`. Chưa có API nghiệp vụ thật, admin hoặc đăng nhập thật.
+- Backend hiện có health check, Docker Compose PostgreSQL local, Prisma migration đầu tiên, seed dữ liệu mẫu và API public đầu tiên trong `server/`. Chưa có admin hoặc đăng nhập thật.
