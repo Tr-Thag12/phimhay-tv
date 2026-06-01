@@ -1,6 +1,6 @@
 # PhimHay TV - Base Project
 
-Đây là base project cho website xem phim PhimHay TV. Frontend đang chạy bằng Vite, HTML/CSS/JavaScript thuần. Backend hiện có skeleton Node.js + Express + Prisma trong thư mục `server/`, chưa có database thật và chưa nối frontend.
+Đây là base project cho website xem phim PhimHay TV. Frontend đang chạy bằng Vite, HTML/CSS/JavaScript thuần. Backend hiện có Node.js + Express + Prisma trong thư mục `server/`, kèm PostgreSQL local bằng Docker Compose, migration đầu tiên và seed dữ liệu mẫu. Frontend chưa nối với backend.
 
 Demo Vercel: https://phimhay-tv.vercel.app/
 
@@ -22,10 +22,14 @@ phimhay-tv-base/
 ├─ assets/
 ├─ server/
 │  ├─ package.json
+│  ├─ package-lock.json
+│  ├─ docker-compose.yml
 │  ├─ .env.example
 │  ├─ README.md
 │  ├─ prisma/
-│  │  └─ schema.prisma
+│  │  ├─ schema.prisma
+│  │  ├─ seed.js
+│  │  └─ migrations/
 │  └─ src/
 │     ├─ app.js
 │     ├─ server.js
@@ -112,6 +116,16 @@ Health check:
 http://localhost:4000/api/health
 ```
 
+Database local bằng Docker Compose:
+
+```bash
+cd server
+Copy-Item .env.example .env
+npm run db:up
+npm run db:migrate -- --name init
+npm run db:seed
+```
+
 Xem hướng dẫn chi tiết tại [server/README.md](server/README.md).
 
 Frontend vẫn chạy ở root project bằng:
@@ -187,4 +201,4 @@ Ghi chú:
 - Luồng render chính bắt đầu từ `src/main.js`, qua `src/router/router.js`, đọc URL hiện tại rồi tới các file view trong `src/render/`.
 - Search, watchlist và history nằm trong `src/features/`.
 - Giao diện chính nằm trong `css/style.css`, dùng CSS variables và chia nhóm style theo base, header, hero, card phim, listing, detail, player, search, account và responsive.
-- Backend hiện mới là skeleton trong `server/`, có health check và Prisma schema nháp. Chưa có API nghiệp vụ thật, database, admin hoặc đăng nhập thật.
+- Backend hiện có health check, Docker Compose PostgreSQL local, Prisma migration đầu tiên và seed dữ liệu mẫu trong `server/`. Chưa có API nghiệp vụ thật, admin hoặc đăng nhập thật.
