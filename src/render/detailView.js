@@ -31,7 +31,7 @@ export function renderDetail(app) {
           <div class="actions">
             <a class="btn btn-primary" href="${watchUrl(movie)}">${icon('play')} Xem ngay</a>
             <button class="btn btn-ghost" onclick="setDetailTab('trailer')">${icon('film')} Trailer</button>
-            <button class="btn btn-ghost" onclick="toggleSave(${movieId}, event)">${icon(isSaved(movie.id) ? 'bookmark-check' : 'bookmark')} ${isSaved(movie.id) ? 'Đã lưu' : 'Thêm vào danh sách'}</button>
+            <button class="btn btn-ghost" onclick='toggleSave(${movieId}, event)'>${icon(isSaved(movie.id) ? 'bookmark-check' : 'bookmark')} ${isSaved(movie.id) ? 'Đã lưu' : 'Thêm vào danh sách'}</button>
             <button class="btn btn-ghost">${icon('share-2')} Chia sẻ</button>
           </div>
           <div class="info-grid">

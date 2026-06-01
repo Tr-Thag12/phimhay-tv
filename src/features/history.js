@@ -1,28 +1,17 @@
-import { getStorage, setStorage } from '../utils/storage.js';
-
-const HISTORY_KEY = 'phimhay_history';
-const DEFAULT_HISTORY = [
-  { movieId: 1, episodeId: 's1e1', progress: 65 },
-  { movieId: 3, episodeId: null, progress: 30 }
-];
+import {
+  getHistory as getRepositoryHistory,
+  saveHistory,
+  setHistory as setRepositoryHistory
+} from '../data/userLibraryRepository.js';
 
 export function getHistory() {
-  return getStorage(HISTORY_KEY, DEFAULT_HISTORY);
+  return getRepositoryHistory();
 }
 
 export function setHistory(items) {
-  setStorage(HISTORY_KEY, items);
+  setRepositoryHistory(items);
 }
 
 export function addHistoryItem(movieId, episodeId) {
-  const id = movieId;
-  const history = getHistory().filter(item => String(item.movieId) !== String(id));
-  setHistory([
-    {
-      movieId: id,
-      episodeId,
-      progress: episodeId ? 12 : 0
-    },
-    ...history
-  ].slice(0, 8));
+  return saveHistory(movieId, episodeId);
 }

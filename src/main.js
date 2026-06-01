@@ -1,4 +1,5 @@
 import { movies, user } from './data/movies.js';
+import { refreshUserLibrary } from './data/userLibraryRepository.js';
 import { initSearch, openSearch } from './features/search.js';
 import { setWatchlistChangeHandler, toggleSave } from './features/watchlist.js';
 import {
@@ -46,10 +47,17 @@ Object.assign(window, {
 setWatchlistChangeHandler(render);
 initRouterEvents();
 initSearch();
-subscribeAuth(() => {
+subscribeAuth(async () => {
+  await refreshUserLibrary();
   renderHeaderAuth();
-  if (state.page === 'account') render();
+  if (['account', 'home', 'detail', 'listing', 'player'].includes(state.page)) render();
 });
 renderHeaderAuth();
-initAuth();
-initCurrentRoute();
+
+async function initApp() {
+  await initAuth();
+  await refreshUserLibrary();
+  initCurrentRoute();
+}
+
+initApp();

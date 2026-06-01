@@ -11,7 +11,7 @@ export function renderHome(app) {
   const hero = movies[0];
   const heroId = JSON.stringify(hero.id);
   const continueItems = getHistory()
-    .map(item => ({ ...item, movie: movieById(item.movieId) }))
+    .map(item => ({ ...item, movie: item.movie || movieById(item.movieId) }))
     .filter(item => item.movie);
   const top = [...movies].sort((a, b) => b.rating - a.rating).slice(0, 5);
   const newest = [...movies].sort((a, b) => b.year - a.year).slice(0, 8);
@@ -29,7 +29,7 @@ export function renderHome(app) {
           <div class="actions">
             <a class="btn btn-primary" href="${watchUrl(hero)}">${icon('play')} Xem ngay</a>
             <a class="btn btn-ghost" href="${detailUrl(hero)}">${icon('film')} Chi tiết</a>
-            <button class="btn btn-ghost" type="button" onclick="toggleSave(${heroId}, event)">${icon('plus')} Danh sách</button>
+            <button class="btn btn-ghost" type="button" onclick='toggleSave(${heroId}, event)'>${icon('plus')} Danh sách</button>
           </div>
         </div>
       </div>
