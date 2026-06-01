@@ -41,6 +41,10 @@ phimhay-tv-base/
 │  ├─ USER_FLOWS.md
 │  ├─ FEATURE_ROADMAP.md
 │  ├─ BACKEND_PLAN.md
+│  ├─ DATABASE_SCHEMA.md
+│  ├─ API_CONTRACT.md
+│  ├─ SECURITY_PLAN.md
+│  ├─ BACKEND_TASKS.md
 │  ├─ NEXT_STEPS.md
 │  ├─ UI_REDESIGN_NOTES.md
 │  ├─ ROUTING_SEO_NOTES.md
@@ -83,6 +87,10 @@ phimhay-tv-base/
 - `docs/USER_FLOWS.md`: Danh sách luồng thao tác cho khách, người dùng đăng nhập, admin và hệ thống.
 - `docs/FEATURE_ROADMAP.md`: Roadmap phát triển theo từng giai đoạn từ frontend mock đến production.
 - `docs/BACKEND_PLAN.md`: Kế hoạch backend đề xuất, bảng dữ liệu và API endpoint.
+- `docs/DATABASE_SCHEMA.md`: Thiết kế chi tiết database schema, quan hệ bảng, constraint, index và Prisma model draft.
+- `docs/API_CONTRACT.md`: API contract dự kiến cho public/auth/user/admin API và response JSON mẫu.
+- `docs/SECURITY_PLAN.md`: Nguyên tắc bảo mật cho auth, phân quyền, validate input, CORS, rate limit và xử lý lỗi.
+- `docs/BACKEND_TASKS.md`: Task backend theo giai đoạn từ skeleton, database, public API đến admin.
 - `docs/NEXT_STEPS.md`: Thứ tự việc nên làm tiếp theo theo mức ưu tiên.
 - `docs/UI_REDESIGN_NOTES.md`: Ghi chú tiếng Việt về hướng thiết kế giao diện V1 và những điểm cần cải thiện ở bước sau.
 - `docs/ROUTING_SEO_NOTES.md`: Ghi chú route, slug và SEO meta cơ bản.
