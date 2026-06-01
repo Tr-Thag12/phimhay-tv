@@ -12,6 +12,7 @@ const state = {
   },
   detailTab: 'overview',
   accountTab: 'profile',
+  accountAuthMode: 'login',
   season: 1,
   searchKeyword: '',
   notFoundMessage: '',

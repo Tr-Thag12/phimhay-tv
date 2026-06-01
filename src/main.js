@@ -18,8 +18,9 @@ import {
   setDetailTab
 } from './router/router.js';
 import { state } from './state/store.js';
+import { initAuth, subscribeAuth } from './state/authStore.js';
 import { createIcons } from './utils/dom.js';
-import { togglePlayerMenu } from './render/layout.js';
+import { renderHeaderAuth, togglePlayerMenu } from './render/layout.js';
 
 window.MOVIES = movies;
 window.USER = user;
@@ -45,4 +46,10 @@ Object.assign(window, {
 setWatchlistChangeHandler(render);
 initRouterEvents();
 initSearch();
+subscribeAuth(() => {
+  renderHeaderAuth();
+  if (state.page === 'account') render();
+});
+renderHeaderAuth();
+initAuth();
 initCurrentRoute();
