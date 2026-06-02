@@ -1,8 +1,8 @@
 # Backend PhimHay TV
 
-Đây là backend Node.js + Express + Prisma của PhimHay TV, đặt riêng trong thư mục `server/`. Hiện backend đã có PostgreSQL local bằng Docker Compose, Prisma migration đầu tiên, seed dữ liệu mẫu, API public cho phim/thể loại/tìm kiếm và Auth API cơ bản dùng JWT.
+Đây là backend Node.js + Express + Prisma của PhimHay TV, đặt riêng trong thư mục `server/`. Hiện backend đã có PostgreSQL local bằng Docker Compose, Prisma migration đầu tiên, seed dữ liệu mẫu, API public cho phim/thể loại/tìm kiếm, Auth API cơ bản dùng JWT và Admin Movie API cơ bản cho quản trị phim.
 
-Frontend vẫn chạy riêng ở thư mục root project. Frontend đã gọi API public, nhưng chưa nối giao diện đăng nhập/đăng ký với Auth API.
+Frontend vẫn chạy riêng ở thư mục root project. Frontend đã gọi API public/Auth API và có admin shell, nhưng chưa nối giao diện CRUD quản lý phim với Admin Movie API.
 
 ## Công nghệ
 
@@ -203,6 +203,79 @@ Test `logout`:
 Invoke-RestMethod -Method Post -Uri "http://localhost:4000/api/auth/logout" -Headers @{ Authorization = "Bearer $token" }
 ```
 
+## Admin Movie API
+
+Admin Movie API yêu cầu JWT Bearer token của tài khoản `ADMIN`. Tất cả endpoint đi qua `authMiddleware` và `requireAdmin`.
+
+Endpoint hiện có:
+
+- `GET /api/admin/movies`: Lấy danh sách phim cho admin, có phân trang và bộ lọc `page`, `limit`, `q`, `type`, `status`, `country`, `category`, `isPublished`, `sort`.
+- `GET /api/admin/movies/:id`: Lấy chi tiết phim theo `id`, kèm country, categories, episodes và banners.
+- `POST /api/admin/movies`: Tạo phim mới, validate bằng `zod`, kiểm tra slug/country/category.
+- `PATCH /api/admin/movies/:id`: Cập nhật một phần thông tin phim, gồm categoryIds nếu cần thay đổi quan hệ thể loại.
+- `PATCH /api/admin/movies/:id/publish`: Bật/tắt publish nhanh.
+- `PATCH /api/admin/movies/:id/featured`: Bật/tắt nổi bật nhanh.
+- `DELETE /api/admin/movies/:id`: Xóa mềm/ẩn phim, không hard delete.
+
+Delete phim hiện là xóa mềm bằng cách đặt `isPublished=false`, `isFeatured=false`, `status=HIDDEN`. API chưa upload ảnh/video thật, chỉ nhận URL text cho `posterUrl`, `backdropUrl`, `trailerUrl`.
+
+Login admin lấy token:
+
+```powershell
+$login = Invoke-RestMethod -Method Post -Uri "http://localhost:4000/api/auth/login" -ContentType "application/json" -Body '{"email":"admin@phimhay.local","password":"Admin@123456"}'
+$adminToken = $login.data.token
+```
+
+Lấy danh sách phim admin:
+
+```powershell
+Invoke-RestMethod -Method Get -Uri "http://localhost:4000/api/admin/movies?page=1&limit=20&sort=newest" -Headers @{ Authorization = "Bearer $adminToken" }
+```
+
+Tạo phim:
+
+```powershell
+$body = @{
+  title = "Phim Admin Test"
+  slug = "phim-admin-test"
+  description = "Phim tạo từ Admin Movie API local."
+  type = "MOVIE"
+  status = "DRAFT"
+  releaseYear = 2026
+  duration = 120
+  quality = "HD"
+  language = "Vietsub"
+  isPublished = $true
+  isFeatured = $false
+} | ConvertTo-Json
+
+Invoke-RestMethod -Method Post -Uri "http://localhost:4000/api/admin/movies" -ContentType "application/json" -Headers @{ Authorization = "Bearer $adminToken" } -Body $body
+```
+
+Cập nhật phim:
+
+```powershell
+Invoke-RestMethod -Method Patch -Uri "http://localhost:4000/api/admin/movies/<movieId>" -ContentType "application/json" -Headers @{ Authorization = "Bearer $adminToken" } -Body '{"title":"Phim Admin Test đã sửa","description":"Mô tả đã cập nhật."}'
+```
+
+Bật/tắt publish:
+
+```powershell
+Invoke-RestMethod -Method Patch -Uri "http://localhost:4000/api/admin/movies/<movieId>/publish" -ContentType "application/json" -Headers @{ Authorization = "Bearer $adminToken" } -Body '{"isPublished":false}'
+```
+
+Bật/tắt nổi bật:
+
+```powershell
+Invoke-RestMethod -Method Patch -Uri "http://localhost:4000/api/admin/movies/<movieId>/featured" -ContentType "application/json" -Headers @{ Authorization = "Bearer $adminToken" } -Body '{"isFeatured":true}'
+```
+
+Xóa mềm phim:
+
+```powershell
+Invoke-RestMethod -Method Delete -Uri "http://localhost:4000/api/admin/movies/<movieId>" -Headers @{ Authorization = "Bearer $adminToken" }
+```
+
 ## Lệnh test curl
 
 ```bash
@@ -242,6 +315,6 @@ Password user mẫu được hash bằng `bcryptjs` trước khi ghi vào cột 
 - Đã có API public đầu tiên cho movies, categories và search.
 - Đã có Auth API cơ bản cho register, login, me, logout bằng JWT.
 - Đã có middleware xác thực JWT và middleware kiểm tra quyền admin.
-- Chưa nối frontend với Auth API.
-- Chưa có admin.
+- Đã có Admin Movie API backend cơ bản cho list/detail/create/update/publish/featured/delete mềm phim.
+- Chưa nối frontend CRUD quản lý phim với Admin Movie API.
 - Chưa deploy backend hoặc database.

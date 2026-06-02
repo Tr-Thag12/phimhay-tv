@@ -96,4 +96,6 @@ Các card này bị khóa và chưa dẫn tới CRUD thật.
 
 ## Việc làm sau
 
-CRUD admin cho phim, tập phim, thể loại, người dùng, bình luận/báo lỗi và dashboard thống kê sẽ được phát triển ở các bước sau.
+Backend hiện đã có Admin Movie API cơ bản cho list/detail/create/update/publish/featured/delete mềm phim tại `/api/admin/movies`. Tuy nhiên các card trong admin shell vẫn chỉ là placeholder, chưa có CRUD UI.
+
+CRUD UI cho phim, tập phim, thể loại, người dùng, bình luận/báo lỗi và dashboard thống kê sẽ được phát triển ở các bước sau.
