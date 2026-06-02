@@ -16,6 +16,7 @@ import { refreshUserLibrary } from '../data/userLibraryRepository.js';
 import { addHistoryItem } from '../features/history.js';
 import { closeSearch } from '../features/search.js';
 import { renderAccount } from '../render/accountView.js';
+import { renderAdmin } from '../render/adminView.js';
 import { renderDetail as renderDetailView } from '../render/detailView.js';
 import { renderHome } from '../render/homeView.js';
 import { closeMobileMenu, closePlayerMenus, movieById, renderHeaderActive, toggleMobileMenu } from '../render/layout.js';
@@ -130,6 +131,11 @@ async function parseCurrentRoute() {
     const data = await loadHomeMovies();
     state.routeMovies = data.movies;
     state.categories = data.categories;
+    return;
+  }
+
+  if (segments.length === 1 && segments[0] === 'admin') {
+    resetRouteState('admin', 'admin');
     return;
   }
 
@@ -261,6 +267,15 @@ function updateMetaForCurrentRoute() {
     return;
   }
 
+  if (state.page === 'admin') {
+    updateSeoMeta({
+      title: 'Quản trị - PhimHay TV',
+      description: 'Khu vực admin local của PhimHay TV được bảo vệ bằng tài khoản ADMIN.',
+      canonicalPath
+    });
+    return;
+  }
+
   if (state.page === 'account') {
     updateSeoMeta({
       title: 'Tài khoản - PhimHay TV',
@@ -296,6 +311,7 @@ export function render() {
   if (state.page === 'detail') renderDetailView(app);
   if (state.page === 'player') renderPlayer(app);
   if (state.page === 'account') renderAccount(app);
+  if (state.page === 'admin') renderAdmin(app);
   if (state.page === 'search') renderSearchPage(app);
   if (state.page === 'notFound') renderNotFound(app);
 
@@ -363,6 +379,11 @@ export function navigateTo(page, payload = {}) {
     return;
   }
 
+  if (page === 'admin') {
+    navigateToUrl('/admin');
+    return;
+  }
+
   if (page === 'detail') {
     const movie = findMovieById(payload.movieId || state.selectedMovieId);
     navigateToUrl(movie ? detailUrl(movie) : '/phim/khong-ton-tai');
@@ -421,6 +442,10 @@ export function navigateToPlayer(movieId, episodeId) {
 
 export function navigateToAccount() {
   navigateToUrl('/tai-khoan');
+}
+
+export function navigateToAdmin() {
+  navigateToUrl('/admin');
 }
 
 export function navigateToSearch(keyword = '') {

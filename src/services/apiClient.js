@@ -1,6 +1,7 @@
 import { getAuthToken } from './authStorage.js';
 
 const DEFAULT_API_BASE_URL = 'http://localhost:4000/api';
+const DEFAULT_REQUEST_TIMEOUT_MS = 5000;
 
 function normalizeBaseUrl(value) {
   return String(value || DEFAULT_API_BASE_URL).replace(/\/+$/, '');
@@ -22,6 +23,7 @@ export async function apiRequest(path, options = {}) {
     auth = false,
     token,
     headers = {},
+    timeoutMs = DEFAULT_REQUEST_TIMEOUT_MS,
     ...fetchOptions
   } = options;
   const url = `${API_BASE_URL}${path.startsWith('/') ? path : `/${path}`}`;
@@ -36,13 +38,36 @@ export async function apiRequest(path, options = {}) {
   }
 
   let response;
+  let timeoutId = null;
+  let requestOptions = {
+    ...fetchOptions,
+    headers: requestHeaders
+  };
+
+  if (timeoutMs > 0 && typeof AbortController !== 'undefined') {
+    const controller = new AbortController();
+    timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+    if (fetchOptions.signal) {
+      if (fetchOptions.signal.aborted) {
+        controller.abort();
+      } else {
+        fetchOptions.signal.addEventListener('abort', () => controller.abort(), { once: true });
+      }
+    }
+
+    requestOptions = {
+      ...requestOptions,
+      signal: controller.signal
+    };
+  }
+
   try {
-    response = await fetch(url, {
-      ...fetchOptions,
-      headers: requestHeaders
-    });
+    response = await fetch(url, requestOptions);
   } catch (error) {
     throw new ApiError('Chưa kết nối được API PhimHay TV', 0, { originalError: error });
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
   }
 
   let payload = null;

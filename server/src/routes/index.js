@@ -1,5 +1,6 @@
 import { Router } from "express";
 
+import adminRoutes from "./admin.routes.js";
 import authRoutes from "./auth.routes.js";
 import categoryRoutes from "./category.routes.js";
 import healthRoutes from "./health.routes.js";
@@ -15,5 +16,6 @@ router.use("/movies", movieRoutes);
 router.use("/categories", categoryRoutes);
 router.use("/search", searchRoutes);
 router.use("/me", meRoutes);
+router.use("/admin", adminRoutes);
 
 export default router;

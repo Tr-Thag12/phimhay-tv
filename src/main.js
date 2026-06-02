@@ -7,6 +7,7 @@ import {
   initRouterEvents,
   navigateTo,
   navigateToAccount,
+  navigateToAdmin,
   navigateToDetail,
   navigateToHome,
   navigateToListing,
@@ -33,6 +34,7 @@ Object.assign(window, {
   navigateToDetail,
   navigateToPlayer,
   navigateToSearch,
+  navigateToAdmin,
   navigateToAccount,
   toggleSave,
   playMovie,
@@ -50,7 +52,7 @@ initSearch();
 subscribeAuth(async () => {
   await refreshUserLibrary();
   renderHeaderAuth();
-  if (['account', 'home', 'detail', 'listing', 'player'].includes(state.page)) render();
+  if (['account', 'admin', 'home', 'detail', 'listing', 'player'].includes(state.page)) render();
 });
 renderHeaderAuth();
 

@@ -15,7 +15,7 @@ export function icon(name) {
 }
 
 export function renderHeaderActive(page) {
-  qsa('.nav-link, .avatar-btn').forEach(link => link.classList.remove('active'));
+  qsa('.nav-link, .avatar-btn, [data-admin-link]').forEach(link => link.classList.remove('active'));
 
   if (page === 'home') {
     document.querySelector('[data-route="home"], [data-page="home"]')?.classList.add('active');
@@ -27,6 +27,8 @@ export function renderHeaderActive(page) {
     document.querySelector('[data-route="explore"], [data-page="listing"]')?.classList.add('active');
   } else if (page === 'account') {
     document.querySelector('[data-route="account"]')?.classList.add('active');
+  } else if (page === 'admin') {
+    document.querySelector('[data-route="admin"]')?.classList.add('active');
   }
 }
 
@@ -45,10 +47,12 @@ export function renderHeaderAuth() {
   const auth = getAuthState();
   const accountLink = document.querySelector('[data-route="account"]');
   const mobileAccountLink = document.querySelector('[data-mobile-account-link]');
+  const adminLinks = qsa('[data-admin-link]');
 
   if (!accountLink) return;
 
   const user = auth.user;
+  const isAdmin = auth.isAuthenticated && user?.role === 'ADMIN';
   const label = auth.isAuthenticated
     ? (user?.displayName || user?.email || 'Tài khoản')
     : 'Đăng nhập';
@@ -65,6 +69,11 @@ export function renderHeaderAuth() {
   if (mobileAccountLink) {
     mobileAccountLink.textContent = auth.isAuthenticated ? label : 'Đăng nhập';
   }
+
+  adminLinks.forEach(link => {
+    link.hidden = !isAdmin;
+    link.setAttribute('aria-hidden', isAdmin ? 'false' : 'true');
+  });
 
   if (window.lucide) window.lucide.createIcons();
 }
