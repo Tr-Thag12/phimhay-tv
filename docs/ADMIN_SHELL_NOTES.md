@@ -2,9 +2,9 @@
 
 ## Mục tiêu
 
-Bước này tạo khung admin an toàn trước khi phát triển CRUD. Phạm vi chỉ gồm route frontend `/admin`, guard frontend, admin shell cơ bản và backend endpoint `GET /api/admin/health` để kiểm tra quyền ADMIN thật.
+Bước này tạo khung admin an toàn và hiện đã có tab quản lý phim nối với Admin Movie API. Route frontend `/admin` vẫn dùng guard frontend, gọi backend endpoint `GET /api/admin/health` để kiểm tra quyền ADMIN thật trước khi render admin shell.
 
-Chưa có CRUD phim, tập phim, thể loại, người dùng, bình luận hoặc dashboard thống kê thật.
+CRUD phim đã có ở frontend admin. CRUD tập phim, thể loại, người dùng, bình luận/báo lỗi hoặc dashboard thống kê thật chưa làm.
 
 ## Luồng admin
 
@@ -81,21 +81,22 @@ API client có timeout request để trạng thái backend tắt không làm `/a
 
 ## Admin shell hiện tại
 
-Admin shell chỉ có:
+Admin shell hiện có:
 
 - Tiêu đề `Quản trị PhimHay TV`.
 - Thông tin admin hiện tại: displayName/email/role.
-- Các card placeholder:
-  - Quản lý phim
+- Tab `Tổng quan`.
+- Tab `Quản lý phim` có CRUD thật cho list/detail/create/update/publish/featured/delete mềm.
+- Các nhóm chưa làm:
   - Quản lý tập phim
   - Quản lý thể loại
   - Quản lý người dùng
   - Quản lý bình luận/báo lỗi
 
-Các card này bị khóa và chưa dẫn tới CRUD thật.
+Các nhóm ngoài phim vẫn bị khóa để giữ đúng phạm vi bước hiện tại.
 
 ## Việc làm sau
 
-Backend hiện đã có Admin Movie API cơ bản cho list/detail/create/update/publish/featured/delete mềm phim tại `/api/admin/movies`. Tuy nhiên các card trong admin shell vẫn chỉ là placeholder, chưa có CRUD UI.
+Backend hiện đã có Admin Movie API cơ bản cho list/detail/create/update/publish/featured/delete mềm phim tại `/api/admin/movies`, và frontend `/admin` đã nối UI CRUD phim qua `src/services/adminMovieApi.js` và `src/render/adminMovieView.js`.
 
-CRUD UI cho phim, tập phim, thể loại, người dùng, bình luận/báo lỗi và dashboard thống kê sẽ được phát triển ở các bước sau.
+CRUD UI cho tập phim, thể loại, người dùng, bình luận/báo lỗi và dashboard thống kê sẽ được phát triển ở các bước sau.

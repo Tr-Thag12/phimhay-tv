@@ -2,7 +2,7 @@
 
 ## Mục tiêu
 
-Bước này bổ sung backend Admin Movie API cho PhimHay TV để chuẩn bị cho màn quản lý phim ở các bước sau. Phạm vi chỉ gồm API backend, validation, service/controller/routes và tài liệu. Frontend admin CRUD, form quản lý phim và upload file thật chưa được làm trong bước này.
+Bước này bổ sung backend Admin Movie API cho PhimHay TV và hiện đã được frontend `/admin` nối vào giao diện quản lý phim. ADMIN có thể xem danh sách, tìm kiếm/lọc/phân trang, xem chi tiết, tạo, sửa, bật/tắt publish, bật/tắt featured và xóa mềm phim. Upload file thật chưa được làm; form frontend chỉ nhập URL poster/backdrop/trailer.
 
 ## Route cần ADMIN
 
@@ -70,14 +70,38 @@ Validation nằm ở `server/src/validators/adminMovie.validator.js` và dùng `
 
 Cách này tránh xóa dữ liệu thật khi phim đã có quan hệ với tập phim, watchlist, lịch sử xem, rating, comment, report hoặc banner.
 
+## Frontend đã nối UI CRUD phim
+
+Frontend admin dùng các file:
+
+- `src/services/adminMovieApi.js`: gọi Admin Movie API với `auth: true`.
+- `src/render/adminView.js`: giữ admin guard, gọi `/api/admin/health`, hiển thị shell và tab `Quản lý phim`.
+- `src/render/adminMovieView.js`: render toolbar, bảng, phân trang, form thêm/sửa, modal chi tiết, toggle publish/featured và xóa mềm.
+
+Luồng UI:
+
+```txt
+ADMIN login
+→ /admin
+→ admin guard
+→ GET /api/admin/health
+→ admin movie UI
+→ adminMovieApi
+→ /api/admin/movies
+→ adminMovieController/adminMovieService
+→ Prisma
+→ PostgreSQL
+```
+
+Nếu backend admin tắt hoặc API lỗi, UI admin báo lỗi rõ ràng và không fallback dữ liệu admin giả.
+
 ## Giới hạn hiện tại
 
-- Chưa làm frontend CRUD admin.
-- Chưa làm form quản lý phim trên `/admin`.
+- Frontend CRUD phim đã có trong `/admin`.
+- Chưa có upload file thật; poster/backdrop/trailer vẫn nhập bằng URL.
 - Chưa upload poster/backdrop/trailer thật, chỉ nhận URL.
+- Chưa có CRUD tập phim, thể loại, user, bình luận/báo lỗi.
 - Chưa thay đổi schema database.
 - Chưa tạo migration mới.
 - Chưa deploy backend.
 - Public API cũ vẫn chỉ trả phim đã publish.
-
-CRUD UI sẽ được làm ở bước sau.

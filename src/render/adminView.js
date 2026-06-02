@@ -4,20 +4,31 @@ import { getAuthState } from '../state/authStore.js';
 import { getAdminGuardState } from '../utils/adminGuard.js';
 import { createIcons } from '../utils/dom.js';
 import { escapeHTML } from '../utils/format.js';
+import { renderAdminMovieManager } from './adminMovieView.js';
 import { icon } from './layout.js';
 
 let requestId = 0;
+let activeAdminTab = 'movies';
 
 const ADMIN_BACKEND_OFFLINE_MESSAGE =
   'Không kết nối được backend admin. Hãy chạy backend local.';
 
 const PLACEHOLDER_CARDS = [
-  ['film', 'Quản lý phim'],
   ['list-video', 'Quản lý tập phim'],
   ['tags', 'Quản lý thể loại'],
   ['users', 'Quản lý người dùng'],
   ['message-square-warning', 'Quản lý bình luận/báo lỗi']
 ];
+
+function bindAdminTabs(app, auth, health) {
+  app.querySelectorAll('[data-admin-tab]').forEach((button) => {
+    button.addEventListener('click', () => {
+      activeAdminTab = button.dataset.adminTab || 'overview';
+      renderAdminShell(app, auth, health);
+      createIcons();
+    });
+  });
+}
 
 function renderAdminBlocked(app, { iconName, title, message, action = '' }) {
   app.innerHTML = `<div class="admin-page container">
@@ -39,16 +50,35 @@ function renderAdminLoading(app) {
   });
 }
 
+function renderOverviewPanel() {
+  return `<div class="admin-grid" aria-label="Các chức năng admin">
+    <article class="admin-card admin-card-ready">
+      <span>${icon('film')}</span>
+      <h3>Quản lý phim</h3>
+      <p class="muted">Đã nối CRUD phim với backend Admin Movie API.</p>
+      <button class="btn btn-primary" type="button" data-admin-tab="movies">${icon('arrow-right')} Mở quản lý phim</button>
+    </article>
+    ${PLACEHOLDER_CARDS.map(([cardIcon, title]) => `<article class="admin-card">
+      <span>${icon(cardIcon)}</span>
+      <h3>${escapeHTML(title)}</h3>
+      <p class="muted">Chưa làm trong bước này để giữ phạm vi chỉ CRUD phim.</p>
+      <button class="btn btn-ghost" type="button" disabled>${icon('lock')} Chưa làm</button>
+    </article>`).join('')}
+  </div>`;
+}
+
 function renderAdminShell(app, auth, health) {
   const user = auth.user || {};
   const displayName = user.displayName || user.email || 'Admin PhimHay TV';
+  const isOverview = activeAdminTab === 'overview';
+  const isMovies = activeAdminTab === 'movies';
 
   app.innerHTML = `<div class="admin-page container">
     <section class="admin-hero">
       <div>
         <p class="eyebrow">Admin shell local</p>
         <h1>Quản trị PhimHay TV</h1>
-        <p class="muted">CRUD admin sẽ được phát triển ở bước sau.</p>
+        <p class="muted">Khu vực admin đã có giao diện quản lý phim nối trực tiếp với Admin Movie API local.</p>
       </div>
       <div class="admin-status">
         <span class="badge gold">${escapeHTML(health.role || user.role || 'ADMIN')}</span>
@@ -68,20 +98,31 @@ function renderAdminShell(app, auth, health) {
       </div>
     </section>
 
-    <section class="admin-grid" aria-label="Các chức năng admin sắp làm">
-      ${PLACEHOLDER_CARDS.map(([cardIcon, title]) => `<article class="admin-card">
-        <span>${icon(cardIcon)}</span>
-        <h3>${escapeHTML(title)}</h3>
-        <p class="muted">Placeholder an toàn, chưa dẫn tới CRUD thật.</p>
-        <button class="btn btn-ghost" type="button" disabled>${icon('lock')} Sắp làm</button>
-      </article>`).join('')}
+    <nav class="admin-tabs" aria-label="Khu vực admin">
+      <button class="admin-tab ${isOverview ? 'active' : ''}" type="button" data-admin-tab="overview">${icon('layout-dashboard')} Tổng quan</button>
+      <button class="admin-tab ${isMovies ? 'active' : ''}" type="button" data-admin-tab="movies">${icon('film')} Quản lý phim</button>
+    </nav>
+
+    <section class="admin-tab-panel ${isOverview ? 'active' : ''}" ${isOverview ? '' : 'hidden'}>
+      ${renderOverviewPanel()}
+    </section>
+
+    <section class="admin-tab-panel ${isMovies ? 'active' : ''}" ${isMovies ? '' : 'hidden'}>
+      <div data-admin-movie-root></div>
     </section>
 
     <section class="admin-note">
       ${icon('info')}
-      <p>CRUD admin sẽ được phát triển ở bước sau. Route này chỉ xác thực quyền admin và hiển thị shell cơ bản.</p>
+      <p>Route admin vẫn kiểm tra quyền bằng frontend guard và <code>GET /api/admin/health</code>. CRUD hiện chỉ áp dụng cho phim; tập phim, thể loại, user và bình luận/báo lỗi chưa được làm.</p>
     </section>
   </div>`;
+
+  bindAdminTabs(app, auth, health);
+
+  if (isMovies) {
+    const movieRoot = app.querySelector('[data-admin-movie-root]');
+    if (movieRoot) renderAdminMovieManager(movieRoot);
+  }
 }
 
 function renderAdminError(app, message) {
