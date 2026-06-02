@@ -1,8 +1,8 @@
 # Backend PhimHay TV
 
-Đây là backend Node.js + Express + Prisma của PhimHay TV, đặt riêng trong thư mục `server/`. Hiện backend đã có PostgreSQL local bằng Docker Compose, Prisma migration đầu tiên, seed dữ liệu mẫu, API public cho phim/thể loại/tìm kiếm, Auth API cơ bản dùng JWT và Admin Movie API cơ bản cho quản trị phim.
+Đây là backend Node.js + Express + Prisma của PhimHay TV, đặt riêng trong thư mục `server/`. Hiện backend đã có PostgreSQL local bằng Docker Compose, Prisma migration đầu tiên, seed dữ liệu mẫu, API public cho phim/thể loại/tìm kiếm, Auth API cơ bản dùng JWT, Admin Movie API cho quản trị phim và Admin Episode API cho quản trị tập phim.
 
-Frontend vẫn chạy riêng ở thư mục root project. Frontend đã gọi API public/Auth API và có admin shell, nhưng chưa nối giao diện CRUD quản lý phim với Admin Movie API.
+Frontend vẫn chạy riêng ở thư mục root project. Frontend đã gọi API public/Auth API, có admin shell và đã nối giao diện CRUD quản lý phim/tập phim với Admin API.
 
 ## Công nghệ
 
@@ -219,6 +219,23 @@ Endpoint hiện có:
 
 Delete phim hiện là xóa mềm bằng cách đặt `isPublished=false`, `isFeatured=false`, `status=HIDDEN`. API chưa upload ảnh/video thật, chỉ nhận URL text cho `posterUrl`, `backdropUrl`, `trailerUrl`.
 
+## Admin Episode API
+
+Admin Episode API yêu cầu JWT Bearer token của tài khoản `ADMIN`. Tất cả endpoint đi qua `authMiddleware` và `requireAdmin`.
+
+Endpoint hiện có:
+
+- `GET /api/admin/episodes`: Lấy danh sách tập phim cho admin, có phân trang và bộ lọc `page`, `limit`, `q`, `movieId`, `status`, `isPublished`, `sort`.
+- `GET /api/admin/episodes/:id`: Lấy chi tiết tập phim theo `id`, kèm thông tin movie cơ bản.
+- `POST /api/admin/episodes`: Tạo tập phim mới, validate bằng `zod`, kiểm tra movie tồn tại và chống trùng `movieId + episodeNumber` hoặc `movieId + slug`.
+- `PATCH /api/admin/episodes/:id`: Cập nhật một phần thông tin tập phim.
+- `PATCH /api/admin/episodes/:id/publish`: Bật/tắt publish nhanh.
+- `DELETE /api/admin/episodes/:id`: Xóa mềm/ẩn tập phim, không hard delete.
+
+Delete tập phim hiện là xóa mềm bằng cách đặt `isPublished=false`, `status=HIDDEN`, `publishedAt=null`. API chưa upload video/thumbnail thật, chỉ nhận URL text cho `videoUrl` và `thumbnailUrl`.
+
+## Ví dụ thao tác Admin API
+
 Login admin lấy token:
 
 ```powershell
@@ -274,6 +291,42 @@ Xóa mềm phim:
 
 ```powershell
 Invoke-RestMethod -Method Delete -Uri "http://localhost:4000/api/admin/movies/<movieId>" -Headers @{ Authorization = "Bearer $adminToken" }
+```
+
+Lấy danh sách tập phim admin:
+
+```powershell
+Invoke-RestMethod -Method Get -Uri "http://localhost:4000/api/admin/episodes?page=1&limit=20&sort=newest" -Headers @{ Authorization = "Bearer $adminToken" }
+```
+
+Tạo tập phim:
+
+```powershell
+$episodeBody = @{
+  movieId = "<movieId>"
+  episodeNumber = 1
+  title = "Tập admin test"
+  slug = "tap-admin-test"
+  status = "DRAFT"
+  isPublished = $false
+  duration = 45
+  videoUrl = "https://example.com/video.mp4"
+  thumbnailUrl = "https://example.com/thumb.jpg"
+} | ConvertTo-Json
+
+Invoke-RestMethod -Method Post -Uri "http://localhost:4000/api/admin/episodes" -ContentType "application/json" -Headers @{ Authorization = "Bearer $adminToken" } -Body $episodeBody
+```
+
+Bật/tắt publish tập phim:
+
+```powershell
+Invoke-RestMethod -Method Patch -Uri "http://localhost:4000/api/admin/episodes/<episodeId>/publish" -ContentType "application/json" -Headers @{ Authorization = "Bearer $adminToken" } -Body '{"isPublished":true}'
+```
+
+Xóa mềm tập phim:
+
+```powershell
+Invoke-RestMethod -Method Delete -Uri "http://localhost:4000/api/admin/episodes/<episodeId>" -Headers @{ Authorization = "Bearer $adminToken" }
 ```
 
 ## Lệnh test curl
